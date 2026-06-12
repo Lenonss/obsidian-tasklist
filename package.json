@@ -1,11 +1,12 @@
 {
   "name": "tasklist-obsidian",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "任务列表管理组件，支持集中式任务数据库，提供新增、编辑、状态切换和移除功能。",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "node esbuild.config.mjs production && tsc -noEmit -skipLibCheck",
+    "build": "node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [],
