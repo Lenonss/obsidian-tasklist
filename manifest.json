@@ -1,9 +1,9 @@
 {
 	"id": "tasklist",
-	"name": "TaskList",
+	"name": "Projex",
 	"version": "1.0.6",
 	"minAppVersion": "1.7.0",
-	"description": "Centralized task management with SQLite database, inline code blocks, OKR tracking, and calendar workboard view.",
+	"description": "All-in-one project execution hub: SQLite database, inline task blocks, OKR tracking, calendar workboard, MCP server, and multi-project support.",
 	"author": "Lenonss",
 	"isDesktopOnly": false
 }
