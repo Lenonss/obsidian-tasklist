@@ -289,6 +289,11 @@
       "blocked": "Blocked",
       "completionRate": "Rate"
     },
+    "tabs": {
+      "calendar": "Calendar",
+      "overview": "Overview",
+      "okr": "OKR"
+    },
     "dashboard": {
       "title": "Dashboard",
       "todayDone": "Today Done",

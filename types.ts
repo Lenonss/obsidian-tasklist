@@ -62,6 +62,7 @@ export interface WorkboardConfig {
   showDashboard: boolean;
   maxCards: number;
   projectId?: string;
+  activeTab?: 'calendar' | 'overview' | 'okr';
   data?: {
     dashboardCollapsed?: boolean;
     okrCollapsed?: boolean;

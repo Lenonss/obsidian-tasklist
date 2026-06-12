@@ -955,6 +955,80 @@ input.tasklist-input-error {
   font-size: 13px;
 }
 
+/* ── Tab Bar ── */
+.workproject--TabBar {
+  display: flex;
+  gap: 4px;
+  padding: 6px 14px;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.workproject--TabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 32px;
+}
+.workproject--TabBtn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+.workproject--TabBtn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.workproject--TabBtn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+.workproject--TabBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Tab Content ── */
+.workproject--TabContent {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Overview Tab ── */
+.workproject--Overview {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── OKR Tab Body ── */
+.workproject--OkrTabBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* ── Calendar Board ── */
 .workproject--CalendarBoard {
   flex: 1;
@@ -1532,6 +1606,19 @@ input.tasklist-input-error {
   .workproject--ChartsRow {
     grid-template-columns: 1fr;
   }
+  .workproject--TabBar {
+    padding: 4px 10px;
+    gap: 3px;
+  }
+  .workproject--TabBtn {
+    padding: 5px 10px;
+    font-size: 12px;
+    min-height: 28px;
+  }
+  .workproject--TabBtn svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 /* ── Reduced motion ── */
@@ -1542,7 +1629,8 @@ input.tasklist-input-error {
   .workproject--StatCard,
   .workproject--NavBtn,
   .workproject--RefreshBtn,
-  .workproject--DashboardHeader {
+  .workproject--DashboardHeader,
+  .workproject--TabBtn {
     transition: none;
   }
   .workproject--CalendarCard:hover,

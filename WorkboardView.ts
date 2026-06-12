@@ -162,6 +162,7 @@ export class WorkboardView extends ItemView {
         timeRange: 'week',
         showDashboard: true,
         maxCards: 20,
+        activeTab: 'calendar',
       };
       await this.saveConfig();
     }
@@ -336,13 +337,20 @@ export class WorkboardView extends ItemView {
     // ── Stats Bar ──
     this.renderStatsBar(container);
 
-    // ── Dashboard ──
-    if (this.config.showDashboard) {
-      this.renderDashboard(container);
-    }
+    // ── Tab Bar ──
+    this.renderTabBar(container);
 
-    // ── Calendar Board ──
-    this.renderCalendarBoard(container);
+    // ── Tab Content ──
+    const tabContent = container.createDiv({ cls: 'workproject--TabContent' });
+
+    const activeTab = this.config.activeTab || 'calendar';
+    if (activeTab === 'calendar') {
+      this.renderCalendarBoard(tabContent);
+    } else if (activeTab === 'overview') {
+      this.renderOverview(tabContent);
+    } else if (activeTab === 'okr') {
+      this.renderOkrTab(tabContent);
+    }
   }
 
   async refresh() {
@@ -452,55 +460,73 @@ export class WorkboardView extends ItemView {
     }
   }
 
-  // ───── Dashboard ─────
+  // ───── Tab Bar ─────
 
-  private renderDashboard(container: HTMLElement) {
-    const dashboard = container.createDiv({
-      cls: 'workproject--Dashboard',
-    });
-    const data = this.config.data || {};
+  private renderTabBar(container: HTMLElement) {
+    const tabBar = container.createDiv({ cls: 'workproject--TabBar' });
 
-    const dashHeader = dashboard.createDiv({
-      cls: 'workproject--DashboardHeader',
-    });
-    const dashCollapsed = data.dashboardCollapsed ?? false;
-    dashHeader.createSpan({
-      text: dashCollapsed ? '▶' : '▼',
-      cls: 'workproject--DashboardHeaderIcon',
-    });
-    dashHeader.createSpan({
-      text: t('workboard.dashboard.title'),
-      cls: 'workproject--DashboardHeaderTitle',
-    });
-    dashHeader.addEventListener('click', () => {
-      void (async () => {
-        this.config.data = this.config.data || {};
-        this.config.data.dashboardCollapsed =
-          !this.config.data.dashboardCollapsed;
-        await this.saveConfig();
-        this.render();
-      })();
-    });
+    const tabs: { id: 'calendar' | 'overview' | 'okr'; icon: string; label: string }[] = [
+      { id: 'calendar', icon: 'calendar-days', label: t('workboard.tabs.calendar') },
+      { id: 'overview', icon: 'bar-chart-3', label: t('workboard.tabs.overview') },
+      { id: 'okr', icon: 'target', label: t('workboard.tabs.okr') },
+    ];
 
-    if (dashCollapsed) return;
+    const activeTab = this.config.activeTab || 'calendar';
 
-    const dashBody = dashboard.createDiv({
-      cls: 'workproject--DashboardBody',
-    });
+    for (const tab of tabs) {
+      const btn = tabBar.createEl('button', {
+        cls: `workproject--TabBtn${tab.id === activeTab ? ' active' : ''}`,
+      });
+      setIcon(btn, tab.icon);
+      btn.createSpan({ text: tab.label });
+      btn.addEventListener('click', () => {
+        if (this.config.activeTab !== tab.id) {
+          void this.switchTab(tab.id);
+        }
+      });
+    }
+  }
 
-    this.renderStatCards(dashBody);
+  private async switchTab(tab: 'calendar' | 'overview' | 'okr') {
+    this.config.activeTab = tab;
+    await this.saveConfig();
+    this.render();
+  }
 
-    const chartsRow = dashBody.createDiv({
+  // ───── Overview Tab ─────
+
+  private renderOverview(container: HTMLElement) {
+    const wrapper = container.createDiv({ cls: 'workproject--Overview' });
+
+    this.renderStatCards(wrapper);
+
+    const chartsRow = wrapper.createDiv({
       cls: 'workproject--ChartsRow',
     });
     this.renderTrendChart(chartsRow.createDiv({ cls: 'workproject--ChartCol' }));
     this.renderDistChart(chartsRow.createDiv({ cls: 'workproject--ChartCol' }));
 
     this.renderDailyBarChart(
-      dashBody.createDiv({ cls: 'workproject--DailyBarRow' })
+      wrapper.createDiv({ cls: 'workproject--DailyBarRow' })
     );
+  }
 
-    this.renderOkrSection(dashBody);
+  // ───── OKR Tab ─────
+
+  private renderOkrTab(container: HTMLElement) {
+    const body = container.createDiv({ cls: 'workproject--OkrTabBody' });
+
+    if (this.okrItems.length === 0) {
+      body.createDiv({
+        text: t('workboard.okr.empty'),
+        cls: 'workproject--EmptyOkr',
+      });
+      return;
+    }
+
+    for (const kr of this.okrItems) {
+      this.renderOkrCard(body, kr);
+    }
   }
 
   private renderStatCards(container: HTMLElement) {
@@ -897,61 +923,6 @@ export class WorkboardView extends ItemView {
     }
 
     card.appendChild(svg);
-  }
-
-  // ───── OKR Section ─────
-
-  private renderOkrSection(container: HTMLElement) {
-    const section = container.createDiv({
-      cls: 'workproject--DashboardOkrSection',
-    });
-
-    const data = this.config.data || {};
-    const okrCollapsed = data.okrCollapsed ?? false;
-
-    const header = section.createDiv({
-      cls: 'workproject--DashboardHeader',
-    });
-    header.createSpan({
-      text: okrCollapsed ? '▶' : '▼',
-      cls: 'workproject--DashboardHeaderIcon',
-    });
-    header.createSpan({
-      text: t('workboard.okr.title'),
-      cls: 'workproject--DashboardHeaderTitle',
-    });
-    header.createSpan({
-      text: String(this.okrItems.length),
-      cls: 'workproject--ColumnCount',
-    });
-
-    header.addEventListener('click', () => {
-      void (async () => {
-        this.config.data = this.config.data || {};
-        this.config.data.okrCollapsed =
-          !this.config.data.okrCollapsed;
-        await this.saveConfig();
-        this.render();
-      })();
-    });
-
-    if (okrCollapsed) return;
-
-    const body = section.createDiv({
-      cls: 'workproject--DashboardOkrBody',
-    });
-
-    if (this.okrItems.length === 0) {
-      body.createDiv({
-        text: t('workboard.okr.empty'),
-        cls: 'workproject--EmptyOkr',
-      });
-      return;
-    }
-
-    for (const kr of this.okrItems) {
-      this.renderOkrCard(body, kr);
-    }
   }
 
   private renderOkrCard(container: HTMLElement, kr: KeyResult) {

@@ -289,6 +289,11 @@
       "blocked": "阻塞",
       "completionRate": "完成率"
     },
+    "tabs": {
+      "calendar": "日历",
+      "overview": "概览",
+      "okr": "OKR"
+    },
     "dashboard": {
       "title": "仪表盘",
       "todayDone": "今日完成",
