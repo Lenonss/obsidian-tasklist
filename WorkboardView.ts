@@ -154,7 +154,7 @@ export class WorkboardView extends ItemView {
   private async loadConfig() {
     try {
       const content = await this.plugin.app.vault.read(this.file);
-      this.config = JSON.parse(content);
+      this.config = JSON.parse(content) as WorkboardConfig;
     } catch {
       this.config = {
         version: 1,
@@ -306,7 +306,7 @@ export class WorkboardView extends ItemView {
     });
     prevBtn.addEventListener('click', () => {
       this.navOffset--;
-      this.refresh();
+      void this.refresh();
     });
 
     const todayBtn = headerRight.createEl('button', {
@@ -315,7 +315,7 @@ export class WorkboardView extends ItemView {
     });
     todayBtn.addEventListener('click', () => {
       this.navOffset = 0;
-      this.refresh();
+      void this.refresh();
     });
 
     const nextBtn = headerRight.createEl('button', {
@@ -324,14 +324,14 @@ export class WorkboardView extends ItemView {
     });
     nextBtn.addEventListener('click', () => {
       this.navOffset++;
-      this.refresh();
+      void this.refresh();
     });
 
     const refreshBtn = headerRight.createEl('button', {
       cls: 'workproject--RefreshBtn',
     });
     setIcon(refreshBtn, 'refresh-cw');
-    refreshBtn.addEventListener('click', () => this.refresh());
+    refreshBtn.addEventListener('click', () => { void this.refresh(); });
 
     // ── Stats Bar ──
     this.renderStatsBar(container);
@@ -405,13 +405,15 @@ export class WorkboardView extends ItemView {
       i++;
     }
 
-    select.addEventListener('change', async () => {
-      const newId = select.value;
-      if (newId === this.currentProjectId) return;
-      this.currentProjectId = newId;
-      this.config.projectId = newId;
-      await this.saveConfig();
-      await this.refresh();
+    select.addEventListener('change', () => {
+      void (async () => {
+        const newId = select.value;
+        if (newId === this.currentProjectId) return;
+        this.currentProjectId = newId;
+        this.config.projectId = newId;
+        await this.saveConfig();
+        await this.refresh();
+      })();
     });
   }
 
@@ -470,12 +472,14 @@ export class WorkboardView extends ItemView {
       text: t('workboard.dashboard.title'),
       cls: 'workproject--DashboardHeaderTitle',
     });
-    dashHeader.addEventListener('click', async () => {
-      this.config.data = this.config.data || {};
-      this.config.data.dashboardCollapsed =
-        !this.config.data.dashboardCollapsed;
-      await this.saveConfig();
-      this.render();
+    dashHeader.addEventListener('click', () => {
+      void (async () => {
+        this.config.data = this.config.data || {};
+        this.config.data.dashboardCollapsed =
+          !this.config.data.dashboardCollapsed;
+        await this.saveConfig();
+        this.render();
+      })();
     });
 
     if (dashCollapsed) return;
@@ -921,12 +925,14 @@ export class WorkboardView extends ItemView {
       cls: 'workproject--ColumnCount',
     });
 
-    header.addEventListener('click', async () => {
-      this.config.data = this.config.data || {};
-      this.config.data.okrCollapsed =
-        !this.config.data.okrCollapsed;
-      await this.saveConfig();
-      this.render();
+    header.addEventListener('click', () => {
+      void (async () => {
+        this.config.data = this.config.data || {};
+        this.config.data.okrCollapsed =
+          !this.config.data.okrCollapsed;
+        await this.saveConfig();
+        this.render();
+      })();
     });
 
     if (okrCollapsed) return;

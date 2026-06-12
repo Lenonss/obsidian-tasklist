@@ -188,9 +188,11 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(toggleBtn, 'arrow-right-circle');
-    toggleBtn.addEventListener('click', async () => {
-      await this.plugin.taskDatabase.cycleTaskStatus(task.id);
-      await this.render();
+    toggleBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.plugin.taskDatabase.cycleTaskStatus(task.id);
+        await this.render();
+      })();
     });
 
     // Edit
@@ -213,9 +215,11 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(delBtn, 'trash-2');
-    delBtn.addEventListener('click', async () => {
-      await this.plugin.taskDatabase.deleteTask(task.id);
-      await this.render();
+    delBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.plugin.taskDatabase.deleteTask(task.id);
+        await this.render();
+      })();
     });
 
     // Remove from this list only (keep in DB)
@@ -227,9 +231,11 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(unlinkBtn, 'link-2-off');
-    unlinkBtn.addEventListener('click', async () => {
-      await this.removeIdFromBlock(task.id);
-      await this.render();
+    unlinkBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.removeIdFromBlock(task.id);
+        await this.render();
+      })();
     });
   }
 
@@ -387,7 +393,7 @@ export class TaskListBlock extends MarkdownRenderChild {
       this.plugin.app,
       this.plugin,
       task,
-      () => this.render()
+      () => { void this.render(); }
     ).open();
   }
 }

@@ -320,10 +320,12 @@ export class TaskListSettingTab extends PluginSettingTab {
         const t0 = tr.createEl('td');
         const toggle = t0.createEl('input', { type: 'checkbox' });
         if (toggle.instanceOf(HTMLInputElement)) toggle.checked = project.enabled;
-        toggle.addEventListener('change', async () => {
-          project.enabled = toggle.checked;
-          await this.plugin.saveSettings();
-          this.display();
+        toggle.addEventListener('change', () => {
+          void (async () => {
+            project.enabled = toggle.checked;
+            await this.plugin.saveSettings();
+            this.display();
+          })();
         });
         tr.createEl('td', { text: project.name });
         tr.createEl('td', { text: project.rootPath || '—', cls: 'tasklist-project-path' });
@@ -332,20 +334,22 @@ export class TaskListSettingTab extends PluginSettingTab {
         const ta = tr.createEl('td');
         ta.createEl('button', { text: t('settings.projects.edit') }).addEventListener('click', () => this.showProjectModal(project));
         const delBtn = ta.createEl('button', { text: t('settings.projects.delete'), cls: 'mod-warning' });
-        delBtn.addEventListener('click', async () => {
-          const confirmed = await showConfirmModal(
-            this.app,
-            t('settings.projects.deleteConfirm').replace('{{name}}', project.name)
-          );
-          if (confirmed) {
-            this.plugin.settings.projects = this.plugin.settings.projects.filter(p => p.id !== project.id);
-            if (this.plugin.settings.activeProjectId === project.id) {
-              const r = this.plugin.settings.projects.filter(p => p.enabled);
-              this.plugin.settings.activeProjectId = r[0]?.id || '';
+        delBtn.addEventListener('click', () => {
+          void (async () => {
+            const confirmed = await showConfirmModal(
+              this.app,
+              t('settings.projects.deleteConfirm').replace('{{name}}', project.name)
+            );
+            if (confirmed) {
+              this.plugin.settings.projects = this.plugin.settings.projects.filter(p => p.id !== project.id);
+              if (this.plugin.settings.activeProjectId === project.id) {
+                const r = this.plugin.settings.projects.filter(p => p.enabled);
+                this.plugin.settings.activeProjectId = r[0]?.id || '';
+              }
+              await this.plugin.saveSettings();
+              this.display();
             }
-            await this.plugin.saveSettings();
-            this.display();
-          }
+          })();
         });
       }
     }

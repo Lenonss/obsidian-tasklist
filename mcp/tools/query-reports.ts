@@ -1,3 +1,4 @@
+/* eslint-disable import/no-nodejs-modules */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { McpContext } from '../types.js';

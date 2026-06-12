@@ -272,13 +272,15 @@ export class OkrBlock extends MarkdownRenderChild {
       attr: { 'aria-label': t('okr.removeFromList') },
     });
     setIcon(removeBtn, 'link-2-off');
-    removeBtn.addEventListener('click', async () => {
-      const config = await this.parseBlockSource();
-      config.krUuids = config.krUuids.filter(
+    removeBtn.addEventListener('click', () => {
+      void (async () => {
+        const config = await this.parseBlockSource();
+        config.krUuids = config.krUuids.filter(
         (id) => id !== kr.uuid
       );
       await this.writeBlock(config);
       await this.render();
+      })();
     });
 
     // Progress bar
@@ -661,17 +663,19 @@ class OkrAddPanel extends Modal {
       text: t('addPanel.addSelected'),
       cls: 'mod-cta',
     });
-    addBtn.addEventListener('click', async () => {
-      const selected: string[] = [];
-      this.checkboxes.forEach((cb, uuid) => {
-        if (cb.checked) selected.push(uuid);
-      });
-      if (selected.length === 0) {
-        new Notice(t('okr.notices.noKRsSelected'));
-        return;
-      }
-      await this.onAdd(selected);
-      this.close();
+    addBtn.addEventListener('click', () => {
+      void (async () => {
+        const selected: string[] = [];
+        this.checkboxes.forEach((cb, uuid) => {
+          if (cb.checked) selected.push(uuid);
+        });
+        if (selected.length === 0) {
+          new Notice(t('okr.notices.noKRsSelected'));
+          return;
+        }
+        await this.onAdd(selected);
+        this.close();
+      })();
     });
 
     const cancelBtn = bottomBar.createEl('button', {
@@ -797,24 +801,26 @@ class OkrOConfigModal extends Modal {
       text: t('common.save'),
       cls: 'mod-cta',
     });
-    saveBtn.addEventListener('click', async () => {
-      const newTitle = titleInput.value.trim();
-      const progress = Math.max(
-        0,
-        Math.min(100, parseInt(progressInput.value, 10) || 0)
-      );
-      const score = parseFloat(scoreInput.value) || 0;
-      const weight = parseFloat(weightInput.value) || 0;
-
-      await this.plugin.taskDatabase.updateObjectiveConfig(
-        this.objective.uuid,
-        { title: newTitle, progress, score, weight }
-      );
-
-      this.config.title = newTitle;
-
-      await this.onSaved();
-      this.close();
+    saveBtn.addEventListener('click', () => {
+      void (async () => {
+        const newTitle = titleInput.value.trim();
+        const progress = Math.max(
+          0,
+          Math.min(100, parseInt(progressInput.value, 10) || 0)
+        );
+        const score = parseFloat(scoreInput.value) || 0;
+        const weight = parseFloat(weightInput.value) || 0;
+  
+        await this.plugin.taskDatabase.updateObjectiveConfig(
+          this.objective.uuid,
+          { title: newTitle, progress, score, weight }
+        );
+  
+        this.config.title = newTitle;
+  
+        await this.onSaved();
+        this.close();
+      })();
     });
 
     const cancelBtn = btnContainer.createEl('button', {
@@ -923,23 +929,25 @@ class OkrKRConfigModal extends Modal {
       text: t('common.save'),
       cls: 'mod-cta',
     });
-    saveBtn.addEventListener('click', async () => {
-      const title = titleInput.value.trim();
-      const progress = Math.max(
-        0,
-        Math.min(100, parseInt(progressInput.value, 10) || 0)
-      );
-      const score = parseFloat(scoreInput.value) || 0;
-      const weight = parseFloat(weightInput.value) || 0;
-      const today = todayInput.value.trim();
-
-      await this.plugin.taskDatabase.updateKRConfig(
-        this.kr.uuid,
-        { title, progress, score, weight, today }
-      );
-
-      await this.onSaved();
-      this.close();
+    saveBtn.addEventListener('click', () => {
+      void (async () => {
+        const title = titleInput.value.trim();
+        const progress = Math.max(
+          0,
+          Math.min(100, parseInt(progressInput.value, 10) || 0)
+        );
+        const score = parseFloat(scoreInput.value) || 0;
+        const weight = parseFloat(weightInput.value) || 0;
+        const today = todayInput.value.trim();
+  
+        await this.plugin.taskDatabase.updateKRConfig(
+          this.kr.uuid,
+          { title, progress, score, weight, today }
+        );
+  
+        await this.onSaved();
+        this.close();
+      })();
     });
 
     const cancelBtn = btnContainer.createEl('button', {
@@ -1088,8 +1096,10 @@ class OkrCreateModal extends Modal {
       text: t('common.save'),
       cls: 'mod-cta',
     });
-    saveBtn.addEventListener('click', async () => {
-      await this.handleSave();
+    saveBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.handleSave();
+      })();
     });
 
     const cancelBtn = btnContainer.createEl('button', {
@@ -1227,9 +1237,11 @@ class ObjectivePickerModal extends Modal {
         cls: 'tasklist-add-row-priority',
       });
 
-      row.addEventListener('click', async () => {
-        await this.onSelect(obj.uuid, obj.title);
-        this.close();
+      row.addEventListener('click', () => {
+        void (async () => {
+          await this.onSelect(obj.uuid, obj.title);
+          this.close();
+        })();
       });
     }
 
@@ -1351,8 +1363,10 @@ class ObjectiveCreateModal extends Modal {
       text: t('common.create'),
       cls: 'mod-cta',
     });
-    saveBtn.addEventListener('click', async () => {
-      await this.handleSave();
+    saveBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.handleSave();
+      })();
     });
 
     const cancelBtn = btnContainer.createEl('button', {

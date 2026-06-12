@@ -78,7 +78,7 @@ export class TaskListView extends ItemView {
     });
     setIcon(refreshButton, 'refresh-cw');
     refreshButton.addEventListener('click', () => {
-      this.refresh();
+      void this.refresh();
     });
 
     // Filter bar
@@ -243,8 +243,10 @@ export class TaskListView extends ItemView {
       },
     });
     setIcon(statusBtn, 'arrow-right-circle');
-    statusBtn.addEventListener('click', async () => {
-      await this.handleStatusToggle(task);
+    statusBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.handleStatusToggle(task);
+      })();
     });
 
     // Edit button
@@ -269,8 +271,10 @@ export class TaskListView extends ItemView {
       },
     });
     setIcon(saveBtn, 'save');
-    saveBtn.addEventListener('click', async () => {
-      await this.handleSaveTask(task);
+    saveBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.handleSaveTask(task);
+      })();
     });
 
     // Remove button
@@ -282,8 +286,10 @@ export class TaskListView extends ItemView {
       },
     });
     setIcon(removeBtn, 'trash-2');
-    removeBtn.addEventListener('click', async () => {
-      await this.handleDeleteTask(task);
+    removeBtn.addEventListener('click', () => {
+      void (async () => {
+        await this.handleDeleteTask(task);
+      })();
     });
   }
 
@@ -339,7 +345,7 @@ export class TaskListView extends ItemView {
       const message = t('tasklist.deleteConfirm') + ': ' + task.title + '?';
       const notice = new Notice(message, 0);
 
-      const noticeEl = notice.noticeEl;
+      const noticeEl = notice.messageEl;
 
       const buttonContainer = noticeEl.createDiv({
         cls: 'tasklist-confirm-buttons',
