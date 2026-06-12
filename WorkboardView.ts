@@ -505,10 +505,7 @@ export class WorkboardView extends ItemView {
     });
     this.renderTrendChart(chartsRow.createDiv({ cls: 'workproject--ChartCol' }));
     this.renderDistChart(chartsRow.createDiv({ cls: 'workproject--ChartCol' }));
-
-    this.renderDailyBarChart(
-      wrapper.createDiv({ cls: 'workproject--DailyBarRow' })
-    );
+    this.renderDailyBarChart(chartsRow.createDiv({ cls: 'workproject--ChartCol' }));
   }
 
   // ───── OKR Tab ─────

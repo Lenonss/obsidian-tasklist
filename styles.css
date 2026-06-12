@@ -765,6 +765,7 @@ input.tasklist-input-error {
   height: 100%;
   overflow: hidden;
   background-color: var(--background-primary);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
 }
 
 .workproject--Loading {
@@ -1364,8 +1365,9 @@ input.tasklist-input-error {
 /* ── Charts ── */
 .workproject--ChartsRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
+  align-items: stretch;
 }
 
 .workproject--ChartCol {
@@ -1373,10 +1375,14 @@ input.tasklist-input-error {
 }
 
 .workproject--DashboardCard {
+  display: flex;
+  flex-direction: column;
   background: var(--background-secondary);
   border-radius: 10px;
   border: 1px solid var(--background-modifier-border);
   padding: 12px;
+  height: 100%;
+  box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .workproject--DashboardCard:hover {
