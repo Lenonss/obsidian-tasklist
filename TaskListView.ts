@@ -345,7 +345,7 @@ export class TaskListView extends ItemView {
       const message = t('tasklist.deleteConfirm') + ': ' + task.title + '?';
       const notice = new Notice(message, 0);
 
-      const noticeEl = notice.messageEl;
+      const noticeEl = notice.noticeEl;
 
       const buttonContainer = noticeEl.createDiv({
         cls: 'tasklist-confirm-buttons',

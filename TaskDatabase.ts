@@ -115,7 +115,6 @@ export class TaskDatabase {
   private async doInit(): Promise<void> {
     try {
       // 1. Initialize SQL.js with embedded WASM (no external file needed)
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       this.SQL = await initSqlWithWasm();
 
       // 2. Load or create the database file

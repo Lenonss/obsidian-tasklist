@@ -2,7 +2,6 @@ import {
   MarkdownRenderChild,
   MarkdownPostProcessorContext,
   TFile,
-  Notice,
   setIcon,
 } from 'obsidian';
 import type TaskListPlugin from './main';
