@@ -6,7 +6,7 @@ import {
   setIcon,
 } from 'obsidian';
 import type TaskListPlugin from './main';
-import { Task, getStatusLabel, getPriorityLabel, TaskStatus, TaskPriority } from './types';
+import { Task, getStatusLabel, getPriorityLabel } from './types';
 import { TaskModal, TaskSubmitData } from './TaskModal';
 import { TaskAddPanel } from './TaskAddPanel';
 import { t } from './i18n';
@@ -39,6 +39,7 @@ export class TaskListBlock extends MarkdownRenderChild {
     this.ctx = ctx;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   async onload() {
     await this.render();
   }

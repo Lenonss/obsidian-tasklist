@@ -167,10 +167,7 @@ export class TaskDatabase {
     const dbPath = this.getDatabasePath();
     const data = this.db.export();
     // Convert Uint8Array to a properly-sized ArrayBuffer
-    const buffer = data.buffer.slice(
-      data.byteOffset,
-      data.byteOffset + data.byteLength
-    ) as ArrayBuffer;
+    const buffer = new Uint8Array(data).buffer;
 
     await this.vaultAdapter.writeBinary(dbPath, buffer);
   }

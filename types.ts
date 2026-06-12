@@ -49,6 +49,8 @@ export interface KeyResult {
   today: string;
   owner: string;
   sourceFile?: string;
+  /** Runtime-only: parent objective text for UI display */
+  _objectiveText?: string;
   createdAt: string;
   updatedAt: string;
 }

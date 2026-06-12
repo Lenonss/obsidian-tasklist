@@ -1,6 +1,6 @@
 import { App, Modal, Notice, setIcon } from 'obsidian';
 import type TaskListPlugin from './main';
-import { Task, getStatusLabel, getPriorityLabel, TaskStatus, TaskPriority } from './types';
+import { Task, getStatusLabel, getPriorityLabel } from './types';
 import { TaskModal, TaskSubmitData } from './TaskModal';
 import { t } from './i18n';
 
@@ -172,7 +172,7 @@ export class TaskAddPanel extends Modal {
       cls: 'mod-cta',
       attr: { 'aria-label': t('addPanel.addSelected') },
     });
-    addBtn.addEventListener('click', () => this.addSelected());
+    addBtn.addEventListener('click', () => { void this.addSelected(); });
 
     const cancelBtn = bottomBar.createEl('button', {
       text: t('common.cancel'),
@@ -192,7 +192,7 @@ export class TaskAddPanel extends Modal {
       this.plugin,
       null,
       () => {
-        this.loadPanelTasks();
+        void this.loadPanelTasks();
       },
       async (data: TaskSubmitData) => {
         const newTask = await this.onNewTaskCreated(data);

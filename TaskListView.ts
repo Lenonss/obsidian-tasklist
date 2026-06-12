@@ -47,7 +47,7 @@ export class TaskListView extends ItemView {
     // Header bar
     const header = container.createDiv({ cls: 'tasklist-header' });
 
-    const titleEl = header.createEl('h4', {
+    header.createEl('h4', {
       text: t('tasklist.title'),
       cls: 'tasklist-header-title',
     });
@@ -339,9 +339,9 @@ export class TaskListView extends ItemView {
       const message = t('tasklist.deleteConfirm') + ': ' + task.title + '?';
       const notice = new Notice(message, 0);
 
-      const noticeEl = notice.noticeEl;
+      const messageEl = notice.messageEl;
 
-      const buttonContainer = noticeEl.createDiv({
+      const buttonContainer = messageEl.createDiv({
         cls: 'tasklist-confirm-buttons',
       });
 

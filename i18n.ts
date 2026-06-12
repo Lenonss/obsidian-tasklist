@@ -4,6 +4,7 @@
  */
 
 // Module-level state — intentionally mutable for simplicity
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let locale: Record<string, any> = {};
 let currentLanguage: string = 'zh';
 
@@ -42,6 +43,7 @@ export function getLanguage(): string {
  */
 export function t(key: string): string {
   const parts = key.split('.');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let current: any = locale;
 
   for (const part of parts) {

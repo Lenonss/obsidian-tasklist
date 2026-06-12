@@ -332,8 +332,8 @@
 }
 
 /* -- Input error state -- */
-.tasklist-input-error {
-  border-color: var(--text-error) !important;
+input.tasklist-input-error {
+  border-color: var(--text-error);
   box-shadow: 0 0 0 1px var(--text-error);
 }
 
@@ -1543,12 +1543,12 @@
   .workproject--NavBtn,
   .workproject--RefreshBtn,
   .workproject--DashboardHeader {
-    transition: none !important;
+    transition: none;
   }
   .workproject--CalendarCard:hover,
   .workproject--OkrCard:hover,
   .workproject--StatCard:hover {
-    transform: none !important;
+    transform: none;
   }
 }
 

@@ -97,12 +97,12 @@ async function main() {
           },
         ],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         content: [
           {
             type: 'text',
-            text: `Error executing ${toolName}: ${error.message || error}`,
+            text: `Error executing ${toolName}: ${error instanceof Error ? error.message : String(error)}`,
           },
         ],
         isError: true,

@@ -1,4 +1,4 @@
-import { TFile, Notice, normalizePath } from 'obsidian';
+import { TFile, TFolder, Notice, normalizePath } from 'obsidian';
 import type TaskListPlugin from './main';
 import { t } from './i18n';
 
@@ -6,6 +6,29 @@ interface MigrationStats {
   objectives: number;
   keyResults: number;
   krProgressUpdates: number;
+}
+
+/** Parsed OKR frontmatter data from YAML */
+interface OkrEntry {
+  id: string;
+  text: string;
+  key_results?: OkrKrItem[];
+  target?: string;
+  owner?: string;
+}
+
+interface OkrKrItem {
+  id: string;
+  text: string;
+  target?: string;
+  owner?: string;
+}
+
+/** Parsed OKR progress entry from daily report frontmatter */
+interface OkrProgressEntry {
+  kr?: string;
+  progress?: number;
+  today?: string;
 }
 
 export class MigrationTool {
@@ -90,9 +113,10 @@ export class MigrationTool {
 
       try {
         const fm = this.getFileFrontmatter(file);
-        if (!fm || !fm.objectives) continue;
+        const fmObj = fm as { objectives?: OkrEntry[] } | null;
+        if (!fmObj || !fmObj.objectives) continue;
 
-        const objectives = fm.objectives as any[];
+        const objectives = fmObj.objectives;
         for (const obj of objectives) {
           if (!obj.id || !obj.text) continue;
           // Skip template placeholders
@@ -158,19 +182,20 @@ export class MigrationTool {
     for (const month of months) {
       const folderPath = normalizePath(`${basePath}/${month}`);
       const folder = this.plugin.app.vault.getAbstractFileByPath(folderPath);
-      if (!folder || !(folder as any).children) continue;
+      if (!folder || !('children' in folder)) continue;
 
-      const children = (folder as any).children as TFile[];
+      const children = (folder as TFolder).children as TFile[];
       for (const file of children) {
         if (file.extension !== 'md') continue;
 
         try {
           const fm = this.getFileFrontmatter(file);
-          if (!fm || !fm.okr || !Array.isArray(fm.okr)) continue;
+          const fmObj = fm as { okr?: (string | OkrProgressEntry)[]; date?: string } | null;
+          if (!fmObj || !fmObj.okr || !Array.isArray(fmObj.okr)) continue;
 
-          const fileDate = fm.date || '';
+          const fileDate = fmObj.date || '';
 
-          for (const entry of fm.okr) {
+          for (const entry of fmObj.okr as OkrProgressEntry[]) {
             const krText =
               typeof entry === 'string' ? entry : entry.kr || '';
             const match = krText.match(/KR\s*\d+\.\d+/i);
@@ -194,7 +219,7 @@ export class MigrationTool {
               });
             }
           }
-        } catch (err) {
+        } catch {
           // Skip files that can't be parsed
         }
       }
@@ -220,7 +245,7 @@ export class MigrationTool {
    */
   private getFileFrontmatter(
     file: TFile
-  ): Record<string, any> | null {
+  ): Record<string, unknown> | null {
     try {
       const cache =
         this.plugin.app.metadataCache.getFileCache(file);
@@ -234,17 +259,18 @@ export class MigrationTool {
    * Parse OKR frontmatter and upsert objectives + key results.
    */
   private async upsertOkrFileData(
-    fm: Record<string, any>,
+    fm: Record<string, unknown>,
     filePath: string
   ): Promise<void> {
-    if (!fm.objectives) return;
+    const fmObj = fm as { objectives?: OkrEntry[] };
+    if (!fmObj.objectives) return;
 
     const yearMatch = filePath.match(/(\d{4})/);
     const quarterMatch = filePath.match(/Q([1-4])/);
     const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
     const quarter = quarterMatch ? parseInt(quarterMatch[1], 10) : 1;
 
-    const objectives = fm.objectives as any[];
+    const objectives = fmObj.objectives;
     for (const obj of objectives) {
       if (!obj.id || !obj.text) continue;
       if (obj.text.indexOf('{{') !== -1) continue;

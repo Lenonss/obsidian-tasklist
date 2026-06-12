@@ -1,7 +1,16 @@
 import esbuild from 'esbuild';
 import process from 'process';
-import builtins from 'builtin-modules';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+
+// Node.js built-in modules (replaces deprecated 'builtin-modules' package)
+const NODE_BUILTINS = [
+  'assert', 'async_hooks', 'buffer', 'child_process', 'cluster', 'console',
+  'constants', 'crypto', 'dgram', 'diagnostics_channel', 'dns', 'domain',
+  'events', 'fs', 'http', 'http2', 'https', 'inspector', 'module', 'net',
+  'os', 'path', 'perf_hooks', 'process', 'punycode', 'querystring',
+  'readline', 'repl', 'stream', 'string_decoder', 'timers', 'tls',
+  'trace_events', 'tty', 'url', 'util', 'v8', 'vm', 'wasi', 'worker_threads', 'zlib',
+];
 
 const prod = process.argv[2] === 'production';
 
@@ -49,7 +58,7 @@ const context = await esbuild.context({
     '@lezer/common',
     '@lezer/highlight',
     '@lezer/lr',
-    ...builtins,
+    ...NODE_BUILTINS,
   ],
   format: 'cjs',
   target: 'es2018',

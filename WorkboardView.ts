@@ -10,7 +10,6 @@ import type {
   WorkboardConfig,
   Task,
   KeyResult,
-  TimeRange,
 } from './types';
 import { VIEW_TYPE_WORKBOARD } from './types';
 import {
@@ -40,6 +39,14 @@ const DOT_COLORS: Record<string, string> = {
   blocked: 'var(--text-error)',
   next: 'var(--text-muted)',
   achievement: 'var(--color-green)',
+};
+
+type DayCell = {
+  date: string;
+  isToday: boolean;
+  isCurrentMonth?: boolean;
+  dayName: string;
+  dayOfMonth: number;
 };
 
 export class WorkboardView extends ItemView {
@@ -80,7 +87,7 @@ export class WorkboardView extends ItemView {
     container.empty();
 
     const viewState = this.leaf.getViewState();
-    const filePath = (viewState as any).state?.file;
+    const filePath = (viewState as { state?: { file?: string } }).state?.file;
     if (filePath) {
       const file = this.plugin.app.vault.getAbstractFileByPath(filePath);
       if (file instanceof TFile && file.extension === 'workboard') {
@@ -95,17 +102,18 @@ export class WorkboardView extends ItemView {
     });
   }
 
-  setState(state: any, result: any): Promise<void> {
-    if (state?.file) {
-      const file = this.plugin.app.vault.getAbstractFileByPath(state.file);
+  setState(state: unknown, result: unknown): Promise<void> {
+    const s = state as { file?: string } | undefined;
+    if (s?.file) {
+      const file = this.plugin.app.vault.getAbstractFileByPath(s.file);
       if (file instanceof TFile) {
-        this.onLoadFile(file);
+        void this.onLoadFile(file);
       }
     }
-    return super.setState(state, result);
+    return super.setState(state, result as import('obsidian').ViewStateResult);
   }
 
-  getState(): any {
+  getState(): Record<string, unknown> {
     return { file: this.file?.path };
   }
 
@@ -238,7 +246,7 @@ export class WorkboardView extends ItemView {
         const objKrs =
           await this.getCurrentDb().readKeyResults(obj.id);
         for (const kr of objKrs) {
-          (kr as any)._objectiveText = obj.text;
+          kr._objectiveText = obj.text;
           if (!kr.sourceFile && obj.sourceFile) {
             kr.sourceFile = obj.sourceFile;
           }
@@ -290,7 +298,6 @@ export class WorkboardView extends ItemView {
 
     this.renderProjectSelector(headerRight);
 
-    const navLabel = this.getNavLabel();
     const prevLabel = this.getPrevLabel();
     const nextLabel = this.getNextLabel();
     const prevBtn = headerRight.createEl('button', {
@@ -614,7 +621,7 @@ export class WorkboardView extends ItemView {
     const ch = height - pt - pb;
     const maxVal = Math.max(1, ...buckets.map((b) => b.done));
 
-    const svg = document.createElementNS(
+    const svg = activeDocument.createElementNS(
       'http://www.w3.org/2000/svg',
       'svg'
     );
@@ -624,7 +631,7 @@ export class WorkboardView extends ItemView {
 
     for (let i = 0; i < buckets.length; i++) {
       const x = pl + (i / Math.max(buckets.length - 1, 1)) * cw;
-      const text = document.createElementNS(
+      const text = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'text'
       );
@@ -643,7 +650,7 @@ export class WorkboardView extends ItemView {
       const y = pt + ch - (buckets[i].done / maxVal) * ch;
       pathD += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
 
-      const circle = document.createElementNS(
+      const circle = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'circle'
       );
@@ -654,7 +661,7 @@ export class WorkboardView extends ItemView {
       svg.appendChild(circle);
     }
 
-    const path = document.createElementNS(
+    const path = activeDocument.createElementNS(
       'http://www.w3.org/2000/svg',
       'path'
     );
@@ -709,7 +716,7 @@ export class WorkboardView extends ItemView {
       blocked: 'var(--text-error)',
     };
 
-    const svg = document.createElementNS(
+    const svg = activeDocument.createElementNS(
       'http://www.w3.org/2000/svg',
       'svg'
     );
@@ -723,7 +730,7 @@ export class WorkboardView extends ItemView {
       const x = pl + i * (barW + barGap);
       const y = pt + ch - barH;
 
-      const rect = document.createElementNS(
+      const rect = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
       );
@@ -735,7 +742,7 @@ export class WorkboardView extends ItemView {
       rect.setAttribute('rx', '3');
       svg.appendChild(rect);
 
-      const valText = document.createElementNS(
+      const valText = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'text'
       );
@@ -748,7 +755,7 @@ export class WorkboardView extends ItemView {
       valText.textContent = String(count);
       svg.appendChild(valText);
 
-      const labelText = document.createElementNS(
+      const labelText = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'text'
       );
@@ -834,7 +841,7 @@ export class WorkboardView extends ItemView {
     const height = 20 + buckets.length * (barH + barGap);
     const maxVal = Math.max(1, ...buckets.map((b) => b.done));
 
-    const svg = document.createElementNS(
+    const svg = activeDocument.createElementNS(
       'http://www.w3.org/2000/svg',
       'svg'
     );
@@ -846,7 +853,7 @@ export class WorkboardView extends ItemView {
       const bw = (buckets[i].done / maxVal) * cw;
       const y = 10 + i * (barH + barGap);
 
-      const labelText = document.createElementNS(
+      const labelText = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'text'
       );
@@ -858,7 +865,7 @@ export class WorkboardView extends ItemView {
       labelText.textContent = buckets[i].label;
       svg.appendChild(labelText);
 
-      const rect = document.createElementNS(
+      const rect = activeDocument.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
       );
@@ -872,7 +879,7 @@ export class WorkboardView extends ItemView {
       svg.appendChild(rect);
 
       if (buckets[i].done > 0) {
-        const valText = document.createElementNS(
+        const valText = activeDocument.createElementNS(
           'http://www.w3.org/2000/svg',
           'text'
         );
@@ -948,7 +955,7 @@ export class WorkboardView extends ItemView {
 
     const card = container.createDiv({
       cls: 'workproject--OkrCard',
-      title: `${(kr as any)._objectiveText || ''} → ${kr.text}`,
+      title: `${kr._objectiveText || ''} → ${kr.text}`,
     });
 
     card.addEventListener('click', () => {
@@ -1090,7 +1097,7 @@ export class WorkboardView extends ItemView {
 
   private renderDayColumn(
     container: HTMLElement,
-    day: any,
+    day: DayCell,
     dayItems: Record<string, Task[]>
   ) {
     const maxPerDay = this.config.maxCards;
@@ -1141,7 +1148,7 @@ export class WorkboardView extends ItemView {
 
   private renderDayCell(
     container: HTMLElement,
-    day: any,
+    day: DayCell,
     dayItems: Record<string, Task[]>
   ) {
     const items = dayItems[day.date] || [];

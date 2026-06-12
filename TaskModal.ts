@@ -66,7 +66,7 @@ export class TaskModal extends Modal {
         this.titleInputEl.addEventListener('keydown', (evt) => {
           if (evt.key === 'Enter') {
             evt.preventDefault();
-            this.handleSubmit();
+            void this.handleSubmit();
           }
         });
       });
@@ -155,7 +155,7 @@ export class TaskModal extends Modal {
     });
 
     submitButton.addEventListener('click', () => {
-      this.handleSubmit();
+      void this.handleSubmit();
     });
 
     const cancelButton = buttonContainer.createEl('button', {

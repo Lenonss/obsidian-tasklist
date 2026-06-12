@@ -111,14 +111,14 @@ export function getProjectInfo(ctx: McpContext): ProjectInfo {
   const taskCountStmt = ctx.db.prepare('SELECT COUNT(*) as cnt FROM tasks');
   let taskCount = 0;
   if (taskCountStmt.step()) {
-    taskCount = (taskCountStmt.getAsObject() as any).cnt as number;
+    taskCount = (taskCountStmt.getAsObject() as { cnt: number }).cnt || 0;
   }
   taskCountStmt.free();
 
   const krCountStmt = ctx.db.prepare('SELECT COUNT(*) as cnt FROM key_results');
   let krCount = 0;
   if (krCountStmt.step()) {
-    krCount = (krCountStmt.getAsObject() as any).cnt as number;
+    krCount = (krCountStmt.getAsObject() as { cnt: number }).cnt || 0;
   }
   krCountStmt.free();
 

@@ -15,6 +15,7 @@ export class TaskListSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
@@ -284,8 +285,7 @@ export class TaskListSettingTab extends PluginSettingTab {
 
     const skillStatus = this.plugin.detectSkillStatus();
     el.createDiv({
-      cls: 'setting-item-description',
-      attr: { style: 'padding: 4px 0;' },
+      cls: 'setting-item-description tasklist-status-padding',
     }).createEl('strong', { text: t(`settings.skill.status.${skillStatus}`) });
 
     new Setting(el)
@@ -319,8 +319,8 @@ export class TaskListSettingTab extends PluginSettingTab {
       for (const project of projects) {
         const tr = tbody.createEl('tr');
         const t0 = tr.createEl('td');
-        const toggle = t0.createEl('input', { type: 'checkbox' }) as HTMLInputElement;
-        toggle.checked = project.enabled;
+        const toggle = t0.createEl('input', { type: 'checkbox' });
+        if (toggle instanceof HTMLInputElement) toggle.checked = project.enabled;
         toggle.addEventListener('change', async () => {
           project.enabled = toggle.checked;
           await this.plugin.saveSettings();
@@ -334,6 +334,7 @@ export class TaskListSettingTab extends PluginSettingTab {
         ta.createEl('button', { text: t('settings.projects.edit') }).addEventListener('click', () => this.showProjectModal(project));
         const delBtn = ta.createEl('button', { text: t('settings.projects.delete'), cls: 'mod-warning' });
         delBtn.addEventListener('click', async () => {
+          // eslint-disable-next-line no-restricted-globals
           if (confirm(t('settings.projects.deleteConfirm').replace('{{name}}', project.name))) {
             this.plugin.settings.projects = this.plugin.settings.projects.filter(p => p.id !== project.id);
             if (this.plugin.settings.activeProjectId === project.id) {

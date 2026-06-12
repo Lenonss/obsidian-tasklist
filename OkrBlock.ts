@@ -43,6 +43,7 @@ export class OkrBlock extends MarkdownRenderChild {
     this.ctx = ctx;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   async onload() {
     // Auto-detect project from the source file path
     const sourcePath = this.ctx.sourcePath;
@@ -141,7 +142,7 @@ export class OkrBlock extends MarkdownRenderChild {
     // ── Header bar ──
     const header = el.createDiv({ cls: 'tasklist-block-header' });
 
-    const titleSpan = header.createSpan({
+    header.createSpan({
       text: config.title || objective.title || objective.text,
       cls: 'tasklist-block-title',
     });
@@ -164,9 +165,9 @@ export class OkrBlock extends MarkdownRenderChild {
       attr: { 'aria-label': t('okr.configureObjective') },
     });
     setIcon(configBtn, 'settings');
-    configBtn.addEventListener('click', () =>
-      this.openOConfigModal(objective!, config)
-    );
+    configBtn.addEventListener('click', () => {
+      this.openOConfigModal(objective as Objective, config);
+    });
 
     // Add KR button
     const addBtn = headerActions.createEl('button', {
@@ -175,9 +176,9 @@ export class OkrBlock extends MarkdownRenderChild {
     });
     setIcon(addBtn, 'plus');
     addBtn.createSpan({ text: ' ' + t('okr.addKR') });
-    addBtn.addEventListener('click', () =>
-      this.openAddPanel(objective!, config)
-    );
+    addBtn.addEventListener('click', () => {
+      this.openAddPanel(objective as Objective, config);
+    });
 
     // ── O summary row ──
     const summaryRow = el.createDiv({
@@ -395,10 +396,10 @@ export class OkrBlock extends MarkdownRenderChild {
     };
 
     try {
-      const parsed = JSON.parse(jsonStr);
+      const parsed = JSON.parse(jsonStr) as Partial<OkrBlockConfig>;
       if (parsed.objectiveId) config.objectiveId = parsed.objectiveId;
       if (parsed.title) config.title = parsed.title;
-      if (Array.isArray(parsed.krIds)) config.krUuids = parsed.krIds;
+      if (Array.isArray(parsed.krUuids)) config.krUuids = parsed.krUuids;
     } catch {
       // Keep defaults on parse error
     }
