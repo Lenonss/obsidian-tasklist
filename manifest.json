@@ -1,9 +1,9 @@
 {
   "id": "tasklist",
   "name": "TaskList",
-  "version": "1.0.0",
-  "minAppVersion": "0.15.0",
-  "description": "任务列表管理组件，支持集中式任务数据库，提供新增、编辑、状态切换和移除功能。",
+  "version": "1.0.1",
+  "minAppVersion": "1.0.0",
+  "description": "Centralized task management with SQLite database, inline code blocks, OKR tracking, and calendar workboard view.",
   "author": "Lenonss",
   "isDesktopOnly": false
 }

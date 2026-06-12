@@ -677,6 +677,7 @@
   align-items: center;
   gap: var(--size-4-2);
   padding: var(--size-4-1) var(--size-4-2);
+  cursor: pointer;
   border-radius: var(--radius-s);
 }
 
@@ -1883,3 +1884,9 @@
   color: var(--text-accent);
   border-bottom-color: var(--text-accent);
 }
+
+/* -- OKR modal utility classes (replace inline styles) -- */
+.tasklist-input-sm { width: 100px; }
+.tasklist-input-full { width: 100%; }
+.tasklist-textarea-update { width: 100%; min-height: 60px; }
+.tasklist-setting-flex { flex: 1; }

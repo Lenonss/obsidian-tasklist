@@ -2,6 +2,10 @@
 
 > 集中式任务数据库 · 日报看板 · OKR 管理 · AI 集成
 
+**English**: TaskList is an Obsidian plugin for centralized task management with SQLite database. It provides inline task list code blocks, OKR (Objectives and Key Results) management, a calendar workboard view with dashboard, multi-project support, and AI integration via MCP Server and Claude Code Skill. Supports Chinese and English.
+
+---
+
 ## 功能概览
 
 | 功能 | 说明 |

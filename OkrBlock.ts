@@ -758,9 +758,8 @@ class OkrOConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100' },
       value: String(this.objective.progress || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    progressInput.style.width = '100px';
 
     // Score
     const scoreGroup = contentEl.createDiv({
@@ -771,9 +770,8 @@ class OkrOConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100', step: '0.1' },
       value: String(this.objective.score || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    scoreInput.style.width = '100px';
 
     // Weight
     const weightGroup = contentEl.createDiv({
@@ -784,9 +782,8 @@ class OkrOConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100', step: '0.1' },
       value: String(this.objective.weight || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    weightInput.style.width = '100px';
 
     // Buttons
     const btnContainer = contentEl.createDiv({
@@ -874,9 +871,8 @@ class OkrKRConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100' },
       value: String(this.kr.progress || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    progressInput.style.width = '100px';
 
     // Score
     const scoreGroup = contentEl.createDiv({
@@ -887,9 +883,8 @@ class OkrKRConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100', step: '0.1' },
       value: String(this.kr.score || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    scoreInput.style.width = '100px';
 
     // Weight
     const weightGroup = contentEl.createDiv({
@@ -900,9 +895,8 @@ class OkrKRConfigModal extends Modal {
       type: 'number',
       attr: { min: '0', max: '100', step: '0.1' },
       value: String(this.kr.weight || 0),
-      cls: 'tasklist-modal-title',
+      cls: 'tasklist-modal-title tasklist-input-sm',
     });
-    weightInput.style.width = '100px';
 
     // Today update
     const todayGroup = contentEl.createDiv({
@@ -910,13 +904,12 @@ class OkrKRConfigModal extends Modal {
     });
     todayGroup.createEl('label', { text: t('okr.todaysUpdate') });
     const todayInput = todayGroup.createEl('textarea', {
+      cls: 'tasklist-textarea-update',
       attr: {
         placeholder: t('okr.todaysUpdatePlaceholder'),
         value: this.kr.today || '',
       },
     });
-    todayInput.style.width = '100%';
-    todayInput.style.minHeight = '60px';
 
     // Buttons
     const btnContainer = contentEl.createDiv({
@@ -1035,13 +1028,10 @@ class OkrCreateModal extends Modal {
     const extraRow = contentEl.createDiv({
       cls: 'tasklist-modal-row',
     });
-    extraRow.style.display = 'flex';
-    extraRow.style.gap = 'var(--size-4-2)';
 
     const targetGroup = extraRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    targetGroup.style.flex = '1';
     targetGroup.createEl('label', { text: t('okr.target') });
     this.krTargetInput = targetGroup.createEl('input', {
       type: 'text',
@@ -1050,9 +1040,8 @@ class OkrCreateModal extends Modal {
     });
 
     const ownerGroup = extraRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    ownerGroup.style.flex = '1';
     ownerGroup.createEl('label', { text: t('okr.owner') });
     this.krOwnerInput = ownerGroup.createEl('input', {
       type: 'text',
@@ -1064,13 +1053,10 @@ class OkrCreateModal extends Modal {
     const scoreWeightRow = contentEl.createDiv({
       cls: 'tasklist-modal-row',
     });
-    scoreWeightRow.style.display = 'flex';
-    scoreWeightRow.style.gap = 'var(--size-4-2)';
 
     const scoreGroup = scoreWeightRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    scoreGroup.style.flex = '1';
     scoreGroup.createEl('label', { text: t('okr.score') });
     this.krScoreInput = scoreGroup.createEl('input', {
       type: 'number',
@@ -1080,9 +1066,8 @@ class OkrCreateModal extends Modal {
     });
 
     const weightGroup = scoreWeightRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    weightGroup.style.flex = '1';
     weightGroup.createEl('label', { text: t('okr.weightPercent') });
     this.krWeightInput = weightGroup.createEl('input', {
       type: 'number',
@@ -1225,11 +1210,9 @@ class ObjectivePickerModal extends Modal {
     const listEl = contentEl.createDiv({
       cls: 'tasklist-add-list',
     });
-    listEl.style.maxHeight = '50vh';
 
     for (const obj of this.objectives) {
       const row = listEl.createDiv({ cls: 'tasklist-add-row' });
-      row.style.cursor = 'pointer';
 
       row.createSpan({
         text: obj.title || obj.text,
@@ -1295,13 +1278,10 @@ class ObjectiveCreateModal extends Modal {
     const yqRow = contentEl.createDiv({
       cls: 'tasklist-modal-row',
     });
-    yqRow.style.display = 'flex';
-    yqRow.style.gap = 'var(--size-4-2)';
 
     const yearGroup = yqRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    yearGroup.style.flex = '1';
     yearGroup.createEl('label', { text: t('okr.year') });
     this.yearInput = yearGroup.createEl('input', {
       type: 'number',
@@ -1310,9 +1290,8 @@ class ObjectiveCreateModal extends Modal {
     });
 
     const quarterGroup = yqRow.createDiv({
-      cls: 'tasklist-modal-setting',
+      cls: 'tasklist-modal-setting tasklist-setting-flex',
     });
-    quarterGroup.style.flex = '1';
     quarterGroup.createEl('label', { text: t('okr.quarter') });
     this.quarterSelect = quarterGroup.createEl('select', {
       cls: 'tasklist-add-filter-select',
