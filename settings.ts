@@ -43,8 +43,10 @@ export class TaskListSettingTab extends PluginSettingTab {
 
       const content = containerEl.createDiv({
         cls: 'tasklist-settings-content',
-        attr: { style: tab.id === this.activeTab ? '' : 'display: none;' },
       });
+      if (tab.id !== this.activeTab) {
+        content.addClass('tasklist-settings-tab-hidden');
+      }
       tabContents[tab.id] = content;
 
       btn.addEventListener('click', () => {
@@ -248,8 +250,7 @@ export class TaskListSettingTab extends PluginSettingTab {
 
     const mcpStatus = this.plugin.detectMcpStatus();
     el.createDiv({
-      cls: 'setting-item-description',
-      attr: { style: 'padding: 4px 0;' },
+      cls: 'setting-item-description tasklist-status-padding',
     }).createEl('strong', { text: t(`settings.mcp.status.${mcpStatus}`) });
 
     new Setting(el)
@@ -307,7 +308,7 @@ export class TaskListSettingTab extends PluginSettingTab {
     hi.createDiv({ cls: 'setting-item-description', text: '管理多个工作项目，每个项目拥有独立的数据和 Markdown 目录' });
 
     if (projects.length === 0) {
-      el.createDiv({ text: t('settings.projects.noProjects'), cls: 'setting-item-description', attr: { style: 'padding: 8px 0; opacity: 0.6;' } });
+      el.createDiv({ text: t('settings.projects.noProjects'), cls: 'setting-item-description tasklist-empty-hint' });
     } else {
       const table = el.createEl('table', { cls: 'tasklist-project-table' });
       const thead = table.createEl('thead');

@@ -277,13 +277,11 @@ export class TaskAddPanel extends Modal {
         medium: 'var(--text-warning)',
         low: 'var(--text-muted)',
       };
-      row.createDiv({
+      const priorityDot = row.createDiv({
         cls: 'tasklist-priority-dot',
-        attr: {
-          style:
-            'background-color: ' +
-            (colors[task.priority] || colors['medium']),
-        },
+      });
+      priorityDot.setCssProps({
+        '--priority-color': colors[task.priority] || colors['medium'],
       });
 
       row.createSpan({

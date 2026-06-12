@@ -182,15 +182,13 @@ export class TaskListView extends ItemView {
       medium: 'var(--text-warning)',
       low: 'var(--text-muted)',
     };
-    card.createDiv({
+    const priorityDot = card.createDiv({
       cls: 'tasklist-priority-dot',
-      attr: {
-        style:
-          'background-color: ' +
-          (priorityColors[task.priority] || priorityColors['medium']),
-        'aria-label': 'Priority: ' + getPriorityLabel(task.priority),
-      },
     });
+    priorityDot.setCssProps({
+      '--priority-color': priorityColors[task.priority] || priorityColors['medium'],
+    });
+    priorityDot.setAttr('aria-label', 'Priority: ' + getPriorityLabel(task.priority));
 
     // Card body
     const cardBody = card.createDiv({ cls: 'tasklist-card-body' });

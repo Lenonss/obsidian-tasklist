@@ -1890,3 +1890,36 @@
 .tasklist-input-full { width: 100%; }
 .tasklist-textarea-update { width: 100%; min-height: 60px; }
 .tasklist-setting-flex { flex: 1; }
+
+/* -- OKR progress fill (uses CSS custom properties set via setCssProps) -- */
+.tasklist-okr-progress-fill {
+  width: var(--progress-width, 0%);
+  background-color: var(--progress-color, var(--interactive-accent));
+}
+.workproject--OkrProgressFill {
+  width: var(--progress-width, 0%);
+  background-color: var(--progress-color, var(--interactive-accent));
+}
+
+/* -- Dynamic color elements (uses CSS custom properties set via setCssProps) -- */
+.workproject--StatCardValue {
+  color: var(--stat-color, inherit);
+}
+.workproject--CalendarCardDot {
+  background-color: var(--dot-color, var(--interactive-accent));
+}
+.tasklist-priority-dot {
+  background-color: var(--priority-color, var(--interactive-accent));
+}
+
+/* -- Settings tab visibility -- */
+.tasklist-settings-tab-hidden {
+  display: none;
+}
+.tasklist-status-padding {
+  padding: 4px 0;
+}
+.tasklist-empty-hint {
+  padding: 8px 0;
+  opacity: 0.6;
+}
