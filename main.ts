@@ -694,7 +694,7 @@ export default class TaskListPlugin extends Plugin {
 
     const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_TASKLIST);
     if (existingLeaves.length > 0) {
-      workspace.revealLeaf(existingLeaves[0]);
+      workspace.setActiveLeaf(existingLeaves[0], { focus: true });
       return;
     }
 
@@ -704,7 +704,7 @@ export default class TaskListPlugin extends Plugin {
         type: VIEW_TYPE_TASKLIST,
         active: true,
       });
-      workspace.revealLeaf(leaf);
+      workspace.setActiveLeaf(leaf, { focus: true });
     }
   }
 

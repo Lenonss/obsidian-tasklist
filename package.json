@@ -1,6 +1,6 @@
 {
   "name": "tasklist-obsidian",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "任务列表管理组件，支持集中式任务数据库，提供新增、编辑、状态切换和移除功能。",
   "main": "main.js",
   "scripts": {
