@@ -1,0 +1,334 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "create": "创建",
+    "edit": "编辑",
+    "delete": "删除",
+    "add": "添加",
+    "refresh": "刷新",
+    "close": "关闭",
+    "confirm": "确认",
+    "search": "搜索任务...",
+    "selectAll": "全选",
+    "selected": "已选",
+    "more": "更多",
+    "source": "来源"
+  },
+  "status": {
+    "pending": "未开始",
+    "in-progress": "进行中",
+    "done": "已完成"
+  },
+  "priority": {
+    "high": "高",
+    "medium": "中",
+    "low": "低"
+  },
+  "settings": {
+    "title": "TaskList 设置",
+    "language": {
+      "name": "语言",
+      "desc": "界面显示语言",
+      "optionZh": "中文",
+      "optionEn": "English"
+    },
+    "databasePath": {
+      "name": "数据库文件路径",
+      "desc": "SQLite 数据库文件路径（相对于仓库根目录），存储所有任务数据。",
+      "placeholder": "文档库/模块/工作项目/任务数据库.db"
+    },
+    "defaultPriority": {
+      "name": "默认优先级",
+      "desc": "新建任务的默认优先级"
+    },
+    "defaultStatus": {
+      "name": "默认状态",
+      "desc": "新建任务的默认状态"
+    },
+    "workboardDefaults": "工作看板默认值",
+    "defaultWorkboardYear": {
+      "name": "默认年份",
+      "desc": "新建看板和同步操作的默认年份"
+    },
+    "defaultQuarter": {
+      "name": "默认季度",
+      "desc": "新建 OKR 目标和同步操作的默认季度"
+    },
+    "defaultTimeRange": {
+      "name": "默认时间范围",
+      "desc": "新建看板的默认视图"
+    },
+    "timeRange": {
+      "week": "周",
+      "month": "月",
+      "quarter": "季度",
+      "year": "年"
+    },
+    "showDashboard": {
+      "name": "显示仪表盘",
+      "desc": "新建看板默认显示仪表盘面板"
+    },
+    "maxCards": {
+      "name": "每日最多卡片数",
+      "desc": "日历视图每天可见的任务卡片上限（1-100）"
+    },
+    "languageHint": "切换语言后，已打开的视图需要重新打开才能生效。",
+    "projects": {
+      "title": "项目管理",
+      "add": "添加项目",
+      "edit": "编辑",
+      "delete": "删除",
+      "deleteConfirm": "确定要删除项目「{{name}}」吗？数据库文件不会被删除。",
+      "name": "名称",
+      "namePlaceholder": "项目名称",
+      "rootPath": "根目录",
+      "rootPathPlaceholder": "Markdown 文件根目录路径",
+      "dbFileName": "数据库文件",
+      "dbFileNamePlaceholder": "项目名.db",
+      "enabled": "启用",
+      "activeProject": "活跃项目",
+      "dataDir": {
+        "name": "数据库存储目录",
+        "desc": "所有项目数据库文件的集中存储目录（相对于仓库根目录）",
+        "placeholder": ".tasklist/databases"
+      },
+      "noProjects": "暂无项目，点击「添加项目」创建第一个。",
+      "pathNotExist": "目录不存在，是否继续？"
+    },
+    "mcp": {
+      "title": "MCP Server",
+      "install": "安装 MCP Server",
+      "reinstall": "重新安装",
+      "testConnection": "测试连接",
+      "reregister": "重新注册到 mcp.json",
+      "status": {
+        "installed": "✓ 已安装",
+        "notInstalled": "✗ 未安装",
+        "depsMissing": "⚠ 依赖未安装",
+        "entriesMissing": "⚠ 部分项目未注册",
+        "testing": "⏳ 测试中...",
+        "testSuccess": "✓ 连接成功",
+        "testFailed": "✗ 连接失败",
+        "installing": "⏳ 安装中..."
+      }
+    },
+    "skill": {
+      "title": "Skill",
+      "install": "安装 Skill",
+      "update": "更新 Skill",
+      "view": "查看",
+      "status": {
+        "installed": "✓ 已安装",
+        "notInstalled": "✗ 未安装"
+      }
+    }
+  },
+  "tasklist": {
+    "title": "任务列表",
+    "add": "添加",
+    "refreshTooltip": "刷新任务列表",
+    "filterStatus": {
+      "all": "全部状态",
+      "pending": "未开始",
+      "in-progress": "进行中",
+      "done": "已完成"
+    },
+    "filterPriority": {
+      "all": "全部优先级",
+      "high": "高优先级",
+      "medium": "中优先级",
+      "low": "低优先级"
+    },
+    "empty": "暂无任务，点击「添加」创建第一个任务。",
+    "loadFailed": "无法加载任务，请检查设置中的数据库路径。",
+    "priorityLabel": "优先级",
+    "updated": "更新于",
+    "deleteConfirm": "删除任务",
+    "notices": {
+      "toggleFailed": "状态切换失败",
+      "saved": "任务已保存",
+      "saveFailed": "保存失败，任务可能已被删除。",
+      "deleted": "任务已删除",
+      "deleteFailed": "删除失败，任务可能已被移除。"
+    }
+  },
+  "modal": {
+    "newTask": "新建任务",
+    "editTask": "编辑任务",
+    "save": "保存",
+    "create": "创建",
+    "cancel": "取消",
+    "taskTitle": {
+      "name": "任务标题",
+      "desc": "必填，简短摘要",
+      "placeholder": "输入任务标题"
+    },
+    "taskContent": {
+      "name": "任务内容",
+      "desc": "可选，详细信息",
+      "placeholder": "输入任务详情（可选）"
+    },
+    "priority": {
+      "name": "优先级",
+      "desc": "此任务的重要程度"
+    },
+    "status": {
+      "name": "状态",
+      "desc": "此任务的当前状态"
+    },
+    "startDate": {
+      "name": "开始日期",
+      "desc": "任务开始日期（留空则不设日期）"
+    },
+    "endDate": {
+      "name": "结束日期",
+      "desc": "可选的多日任务结束日期",
+      "placeholder": "与开始日期相同"
+    },
+    "notices": {
+      "titleRequired": "任务标题不能为空",
+      "updated": "任务已更新",
+      "created": "任务已创建",
+      "saveFailed": "保存任务失败"
+    }
+  },
+  "block": {
+    "title": "任务列表",
+    "add": "添加",
+    "addTooltip": "添加任务到此列表",
+    "toggleTooltip": "切换状态",
+    "editTooltip": "编辑任务",
+    "deleteTooltip": "删除任务",
+    "unlinkTooltip": "仅从此列表移除",
+    "emptyNoRefs": "未引用任何任务，点击「添加」来创建一个。",
+    "emptyDeleted": "引用的任务已从数据库中删除。",
+    "loadFailed": "无法从数据库加载任务。"
+  },
+  "addPanel": {
+    "title": "添加任务到列表",
+    "createNew": "创建新任务",
+    "pickFromDb": "或从数据库中选择：",
+    "emptyNone": "数据库中没有任务，请先创建一个。",
+    "emptyAllIncluded": "数据库中的任务已全部在此列表中。",
+    "addSelected": "添加所选",
+    "notices": {
+      "noSelection": "未选择任务",
+      "addFailed": "添加任务失败"
+    }
+  },
+  "okr": {
+    "noObjective": "尚未配置目标。",
+    "selectObjective": "选择目标",
+    "createObjective": "创建目标",
+    "loadFailed": "无法加载 OKR 数据。",
+    "objectiveNotFound": "未找到目标",
+    "configureObjective": "配置目标",
+    "addKR": "添加 KR",
+    "addKRTooltip": "添加 KR 到此列表",
+    "progress": "进度",
+    "score": "评分",
+    "weight": "权重",
+    "noKRs": "暂无关键结果，点击「添加 KR」来添加。",
+    "updateKR": "更新 KR",
+    "removeFromList": "从列表移除",
+    "addKeyResultsTitle": "添加关键结果",
+    "createNewKR": "创建新 KR",
+    "pickFromDb": "或从数据库中选择：",
+    "noKRsFound": "此目标下没有关键结果，请先创建一个。",
+    "selectObjectiveTitle": "选择目标",
+    "noObjectivesInDb": "数据库中没有目标，请先执行「同步 OKR 到数据库」或创建一个。",
+    "createObjectiveTitle": "创建目标",
+    "year": "年份",
+    "quarter": "季度",
+    "objectiveId": "目标 ID",
+    "title": "标题（显示用）",
+    "text": "描述",
+    "configureTitle": "配置",
+    "progressPercent": "进度 (%)",
+    "weightPercent": "权重 (%)",
+    "todaysUpdate": "今日更新",
+    "todaysUpdatePlaceholder": "此 KR 今天完成了什么...",
+    "krId": "KR ID",
+    "krTitle": "标题",
+    "krText": "文字",
+    "target": "目标（可选）",
+    "owner": "负责人（可选）",
+    "createKRTtile": "创建关键结果",
+    "objectiveLabel": "目标",
+    "updateTitle": "更新",
+    "notices": {
+      "krIdRequired": "KR ID 不能为空",
+      "krTextRequired": "KR 文字不能为空",
+      "objectiveIdRequired": "目标 ID 不能为空",
+      "objectiveTextRequired": "目标描述不能为空",
+      "invalidYear": "请输入有效年份",
+      "noKRsSelected": "未选择 KR"
+    }
+  },
+  "workboard": {
+    "loading": "⏳ 加载中...",
+    "opening": "正在打开看板...",
+    "title": "📊 工作项目",
+    "today": "📅 今天",
+    "prevWeek": "← 上一周",
+    "nextWeek": "下一周 →",
+    "prevMonth": "← 上一月",
+    "nextMonth": "下一月 →",
+    "prevQuarter": "← 上一季度",
+    "nextQuarter": "下一季度 →",
+    "prevYear": "← 上一年",
+    "nextYear": "下一年 →",
+    "weekLabel": "周",
+    "monthLabel": "月",
+    "quarterLabel": "季度",
+    "yearLabel": "年",
+    "stats": {
+      "total": "总计",
+      "done": "完成",
+      "blocked": "阻塞",
+      "completionRate": "完成率"
+    },
+    "dashboard": {
+      "title": "仪表盘",
+      "todayDone": "今日完成",
+      "inProgress": "进行中",
+      "totalTasks": "总任务数",
+      "doneTrend": "完成趋势",
+      "taskDistribution": "任务分布",
+      "dailyDetail": "每日完成详情",
+      "todo": "待办",
+      "done": "已完成",
+      "blocked": "阻塞"
+    },
+    "okr": {
+      "title": "🎯 OKR 进度",
+      "empty": "暂无 OKR 数据"
+    },
+    "dayMore": "+{{count}} 更多",
+    "monthMore": "+{{count}}",
+    "unnamedTask": "(未命名任务)",
+    "projectNotFound": "看板绑定的项目已失效，已回退到自动检测"
+  },
+  "commands": {
+    "openTaskList": "打开任务列表",
+    "quickAddTask": "快速添加任务",
+    "syncOkr": "同步 OKR 到数据库",
+    "newWorkboard": "新建工作板"
+  },
+  "menu": {
+    "addToTaskList": "添加到任务列表",
+    "createWorkboardHere": "在此创建看板",
+    "insertTaskList": "插入任务列表",
+    "insertOkr": "插入 OKR",
+    "createTaskFromSelection": "从选中文字创建任务"
+  },
+  "notices": {
+    "syncingOkr": "正在同步 OKR 数据...",
+    "syncComplete": "已同步",
+    "taskCreated": "任务已创建",
+    "taskCreateFailed": "任务创建失败",
+    "workboardCreateFailed": "看板创建失败",
+    "titleRequired": "任务标题不能为空"
+  }
+}

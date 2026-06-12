@@ -1,0 +1,1885 @@
+/* ===== TaskList View Styles ===== */
+
+/* -- View container -- */
+.tasklist-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--size-4-4);
+}
+
+/* -- Header -- */
+.tasklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--size-4-3);
+  padding-bottom: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-header-title {
+  margin: 0;
+  font-size: var(--font-ui-large);
+  color: var(--text-normal);
+  font-weight: var(--font-semibold);
+}
+
+.tasklist-header-actions {
+  display: flex;
+  gap: var(--size-4-1);
+}
+
+/* -- Filter bar -- */
+.tasklist-filter-bar {
+  display: flex;
+  gap: var(--size-4-2);
+  margin-bottom: var(--size-4-3);
+}
+
+.tasklist-filter-select {
+  flex: 1;
+  padding: var(--size-4-1) var(--size-4-2);
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  min-height: 32px;
+  cursor: pointer;
+}
+
+.tasklist-filter-select:hover {
+  border-color: var(--interactive-accent);
+}
+
+.tasklist-filter-select:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+  border-color: var(--interactive-accent);
+}
+
+/* -- Task list container -- */
+.tasklist-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2);
+}
+
+/* -- Empty state -- */
+.tasklist-empty {
+  text-align: center;
+  padding: var(--size-4-8) var(--size-4-4);
+  color: var(--text-muted);
+  font-size: var(--font-ui-medium);
+}
+
+/* -- Common button styles -- */
+.tasklist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--size-4-1) var(--size-4-2);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  gap: var(--size-4-1);
+  transition: background-color 0.15s ease;
+}
+
+.tasklist-btn svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}
+
+.tasklist-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklist-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.tasklist-btn.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.tasklist-btn.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.tasklist-btn-add.mod-cta {
+  font-weight: var(--font-semibold);
+}
+
+.tasklist-btn-remove:hover {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+  border-color: var(--text-error);
+}
+
+.tasklist-btn-toggle:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.tasklist-btn-save:hover {
+  background: var(--color-green);
+  color: var(--text-on-accent);
+  border-color: var(--color-green);
+}
+
+.tasklist-btn-edit:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* -- Task card -- */
+.tasklist-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-4-2);
+  padding: var(--size-4-3);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  transition: box-shadow 0.15s ease;
+}
+
+.tasklist-card:hover {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* -- Priority dot -- */
+.tasklist-priority-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+/* -- Card body -- */
+.tasklist-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+}
+
+/* -- Card info row -- */
+.tasklist-card-info {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  flex-wrap: wrap;
+}
+
+.tasklist-card-title {
+  color: var(--text-normal);
+  font-size: var(--font-ui-medium);
+  word-break: break-word;
+}
+
+/* -- Status badge -- */
+.tasklist-status-badge {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 2px var(--size-4-1);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-medium);
+  line-height: 1.4;
+}
+
+.tasklist-status-pending {
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.tasklist-status-in-progress {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.tasklist-status-done {
+  background: var(--color-green);
+  color: var(--text-on-accent);
+}
+
+/* -- Card content -- */
+.tasklist-card-content {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  line-height: 1.5;
+  word-break: break-word;
+  max-height: 60px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* -- Card footer -- */
+.tasklist-card-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-3);
+  font-size: var(--font-ui-smaller);
+}
+
+.tasklist-card-meta {
+  color: var(--text-faint);
+}
+
+.tasklist-card-date {
+  color: var(--text-faint);
+}
+
+/* -- Card actions -- */
+.tasklist-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+  flex-shrink: 0;
+  margin-left: var(--size-4-1);
+}
+
+/* -- Confirm notice buttons -- */
+.tasklist-confirm-buttons {
+  display: flex;
+  gap: var(--size-4-2);
+  margin-top: var(--size-4-1);
+}
+
+.tasklist-confirm-buttons button {
+  padding: var(--size-4-1) var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.tasklist-confirm-buttons button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklist-confirm-buttons button.mod-warning {
+  background: var(--text-error);
+  color: var(--text-on-accent);
+  border-color: var(--text-error);
+}
+
+.tasklist-confirm-buttons button.mod-warning:hover {
+  opacity: 0.9;
+}
+
+.tasklist-confirm-buttons button:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Task Modal Styles ===== */
+
+.tasklist-modal {
+  min-width: 400px;
+  max-width: 560px;
+}
+
+.tasklist-modal h3 {
+  margin: 0 0 var(--size-4-4) 0;
+  font-size: var(--font-ui-large);
+  color: var(--text-normal);
+}
+
+.tasklist-modal .setting-item {
+  border-top: none;
+  padding: var(--size-4-2) 0;
+}
+
+.tasklist-modal .setting-item-info {
+  width: 100px;
+}
+
+.tasklist-modal .setting-item-control {
+  flex: 1;
+}
+
+.tasklist-modal-title,
+.tasklist-modal-content {
+  width: 100%;
+}
+
+.tasklist-modal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* -- Input error state -- */
+.tasklist-input-error {
+  border-color: var(--text-error) !important;
+  box-shadow: 0 0 0 1px var(--text-error);
+}
+
+/* -- Modal buttons -- */
+.tasklist-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--size-4-2);
+  margin-top: var(--size-4-4);
+  padding-top: var(--size-4-3);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-modal-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  min-height: 44px;
+  padding: var(--size-4-1) var(--size-4-4);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-medium);
+  cursor: pointer;
+}
+
+.tasklist-modal-buttons button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+  font-weight: var(--font-semibold);
+}
+
+.tasklist-modal-buttons button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.tasklist-modal-buttons button:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ===== Code Block (```tasklist) Styles ===== */
+
+.tasklist-block {
+  margin: var(--size-4-2) 0;
+  padding: var(--size-4-3);
+  background: var(--background-primary-alt);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+/* -- Block header -- */
+.tasklist-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--size-4-2);
+  padding-bottom: var(--size-4-1);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-block-title {
+  font-weight: var(--font-semibold);
+  font-size: var(--font-ui-medium);
+  color: var(--text-normal);
+}
+
+.tasklist-block-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-2-2) var(--size-4-2);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  min-height: 32px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+}
+
+.tasklist-block-add-btn:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.tasklist-block-add-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.tasklist-block-add-btn svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}
+
+/* -- Empty / Error state -- */
+.tasklist-block-empty,
+.tasklist-block-error {
+  padding: var(--size-4-4);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.tasklist-block-error {
+  color: var(--text-error);
+}
+
+/* -- Task list -- */
+.tasklist-block-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* -- Single task row -- */
+.tasklist-block-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+  transition: background 0.1s;
+}
+
+.tasklist-block-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* -- Task info in row -- */
+.tasklist-block-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  overflow: hidden;
+}
+
+.tasklist-block-task-title {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasklist-block-task-content {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- Status badge in row -- */
+.tasklist-block-status-badge {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller);
+  padding: 1px var(--size-4-1);
+  border-radius: var(--radius-s);
+}
+
+/* -- Priority label in row -- */
+.tasklist-block-priority-label {
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+}
+
+/* -- Action buttons in row -- */
+.tasklist-block-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.tasklist-btn-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tasklist-btn-small svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tasklist-btn-small:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.tasklist-btn-small:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+.tasklist-btn-remove-small:hover {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+}
+
+/* ===== TaskAddPanel Styles ===== */
+
+.tasklist-add-panel {
+  min-width: 480px;
+  max-width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tasklist-add-panel h3 {
+  margin: 0 0 var(--size-4-2) 0;
+  font-size: var(--font-ui-large);
+  color: var(--text-normal);
+}
+
+/* -- Create section -- */
+.tasklist-add-create-section {
+  margin-bottom: var(--size-4-2);
+}
+
+.tasklist-add-create-section button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  width: 100%;
+  padding: var(--size-4-2);
+  border: none;
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-medium);
+  cursor: pointer;
+}
+
+.tasklist-add-create-section button svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}
+
+.tasklist-add-separator {
+  margin: var(--size-4-3) 0;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-add-subtitle {
+  margin: var(--size-4-2) 0;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+/* -- Filter bar -- */
+.tasklist-add-filter-bar {
+  display: flex;
+  gap: var(--size-4-2);
+  margin-bottom: var(--size-4-2);
+}
+
+.tasklist-add-search {
+  flex: 2;
+  padding: var(--size-4-1) var(--size-4-2);
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+}
+
+.tasklist-add-search:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+  border-color: var(--interactive-accent);
+}
+
+.tasklist-add-filter-select {
+  flex: 1;
+  padding: var(--size-4-1) var(--size-4-2);
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.tasklist-add-filter-select:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+}
+
+/* -- Select all row -- */
+.tasklist-add-select-all {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-1) var(--size-4-2);
+  margin-bottom: var(--size-4-1);
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.tasklist-add-select-all input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--interactive-accent);
+}
+
+/* -- Task list -- */
+.tasklist-add-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 40vh;
+  margin-bottom: var(--size-4-2);
+}
+
+.tasklist-add-empty {
+  padding: var(--size-4-4);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+/* -- Task row -- */
+.tasklist-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  padding: var(--size-4-1) var(--size-4-2);
+  border-radius: var(--radius-s);
+}
+
+.tasklist-add-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklist-add-row input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--interactive-accent);
+}
+
+.tasklist-add-row-title {
+  flex: 1;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tasklist-add-row-priority {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  width: 24px;
+  text-align: center;
+}
+
+/* -- Bottom bar -- */
+.tasklist-add-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--size-4-2);
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-add-counter {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.tasklist-add-bottom button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  min-height: 36px;
+  padding: var(--size-4-1) var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-medium);
+  cursor: pointer;
+}
+
+.tasklist-add-bottom button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.tasklist-add-bottom button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.tasklist-add-bottom button:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════
+   Workboard — Calendar & Dashboard Styles
+   Prefix: workproject--
+   Design: Micro-interactions · Professional Modern
+   ════════════════════════════════════════ */
+
+/* ── Root ── */
+.workproject--Root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--background-primary);
+}
+
+.workproject--Loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  font-size: var(--font-ui-medium);
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* ── Header ── */
+.workproject--Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.workproject--HeaderLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.workproject--Title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-normal);
+  letter-spacing: -0.01em;
+}
+
+.workproject--DateLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 2px 10px;
+  background: var(--background-modifier-hover);
+  border-radius: 20px;
+  line-height: 1.6;
+}
+
+.workproject--HeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Project Selector ── */
+.workproject--ProjectSelect {
+  padding: 5px 28px 5px 10px;
+  height: 32px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.workproject--ProjectSelect:hover {
+  border-color: var(--interactive-accent);
+}
+.workproject--ProjectSelect:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 1px;
+  border-color: var(--interactive-accent);
+}
+
+/* ── Navigation Buttons ── */
+.workproject--NavBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  height: 32px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  white-space: nowrap;
+  gap: 4px;
+}
+.workproject--NavBtn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+}
+.workproject--NavBtn:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease;
+}
+.workproject--NavBtn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+.workproject--NavBtnToday {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.workproject--NavBtnToday:hover {
+  opacity: 0.92;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.workproject--RefreshBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.workproject--RefreshBtn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--background-modifier-border-hover);
+}
+.workproject--RefreshBtn:active {
+  transform: scale(0.94);
+  transition: transform 0.1s ease;
+}
+.workproject--RefreshBtn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ── Stats Bar ── */
+.workproject--StatsBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  flex-shrink: 0;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.workproject--Stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 0.18s ease;
+}
+.workproject--Stat:hover {
+  border-color: var(--background-modifier-border-hover);
+}
+.workproject--Stat strong {
+  color: var(--text-normal);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ── Calendar Board ── */
+.workproject--CalendarBoard {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px 14px;
+  scroll-behavior: smooth;
+}
+
+.workproject--CalendarGrid {
+  display: flex;
+  gap: 8px;
+}
+
+.workproject--CalendarGridWeek {
+  height: 100%;
+  min-height: 300px;
+}
+
+.workproject--CalendarGridMonth {
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Month Header Row ── */
+.workproject--CalendarMonthHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 2px;
+  padding: 0 2px;
+}
+
+.workproject--CalendarWeekdayHeader {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 0 4px;
+}
+
+.workproject--CalendarWeekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+/* ── Day Column / Cell ── */
+.workproject--CalendarDay {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--background-modifier-border);
+  overflow: hidden;
+  min-height: 80px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.workproject--CalendarDayToday {
+  background: var(--background-primary);
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 1.5px var(--interactive-accent),
+              inset 0 0 0 1px rgba(var(--interactive-accent-rgb, 54, 157, 255), 0.04);
+}
+.workproject--CalendarDayToday .workproject--CalendarDayHeader {
+  background: rgba(var(--interactive-accent-rgb, 54, 157, 255), 0.06);
+}
+
+.workproject--CalendarDayOtherMonth {
+  opacity: 0.35;
+  background: var(--background-primary);
+}
+
+.workproject--CalendarDayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0;
+  background: transparent;
+  transition: background 0.18s ease;
+}
+
+.workproject--CalendarDayName {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.workproject--CalendarDayToday .workproject--CalendarDayName {
+  color: var(--interactive-accent);
+}
+
+.workproject--CalendarDayDate {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-normal);
+  min-width: 20px;
+  text-align: center;
+  line-height: 1;
+}
+
+.workproject--CalendarDayToday .workproject--CalendarDayDate {
+  color: var(--interactive-accent);
+}
+
+.workproject--CalendarDayBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.workproject--CalendarDayEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 32px;
+  color: var(--text-faint);
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.workproject--CalendarDayMore {
+  padding: 3px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--interactive-accent);
+  cursor: pointer;
+  text-align: center;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.workproject--CalendarDayMore:hover {
+  background: rgba(var(--interactive-accent-rgb, 54, 157, 255), 0.1);
+  color: var(--interactive-accent-hover);
+}
+
+/* ── Calendar Task Card ── */
+.workproject--CalendarCard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: var(--background-primary);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, transform 0.15s ease;
+  min-height: 26px;
+}
+.workproject--CalendarCard:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.workproject--CalendarCard:active {
+  transform: scale(0.98);
+  transition: transform 0.08s ease;
+}
+
+.workproject--CalendarCardAchievement {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.15);
+}
+.workproject--CalendarCardAchievement:hover {
+  border-color: var(--color-green);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+}
+
+.workproject--CalendarCardBlocker {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+.workproject--CalendarCardBlocker:hover {
+  border-color: var(--text-error);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+}
+
+.workproject--CalendarCardRange {
+  background: rgba(168, 85, 247, 0.05);
+  border-color: rgba(168, 85, 247, 0.12);
+}
+.workproject--CalendarCardRange:hover {
+  border-color: var(--color-purple);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.1);
+}
+
+.workproject--CalendarCardMonth {
+  padding: 3px 5px;
+  min-height: 20px;
+  border-radius: 5px;
+}
+
+.workproject--CalendarCardDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
+}
+
+.workproject--CalendarCardMonth .workproject--CalendarCardDot {
+  width: 6px;
+  height: 6px;
+}
+
+.workproject--CalendarCardTitle {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.workproject--CalendarCardMonth .workproject--CalendarCardTitle {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ── Dashboard ── */
+.workproject--Dashboard {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+}
+
+/* Dashboard section header */
+.workproject--DashboardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  user-select: none;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.workproject--DashboardHeader:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.workproject--DashboardHeaderIcon {
+  font-size: 10px;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.workproject--DashboardHeaderTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* Dashboard body */
+.workproject--DashboardBody {
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* ── Stat Cards Row ── */
+.workproject--StatCardsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.workproject--StatCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  background: var(--background-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--background-modifier-border);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: default;
+  min-height: 70px;
+}
+.workproject--StatCard:hover {
+  border-color: var(--background-modifier-border-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+.workproject--StatCardValue {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.workproject--StatCardLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: center;
+}
+
+/* ── Charts ── */
+.workproject--ChartsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.workproject--ChartCol {
+  min-width: 0;
+}
+
+.workproject--DashboardCard {
+  background: var(--background-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--background-modifier-border);
+  padding: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.workproject--DashboardCard:hover {
+  border-color: var(--background-modifier-border-hover);
+}
+
+.workproject--DashboardCardTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.workproject--Chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.workproject--DailyBarRow {
+  display: flex;
+}
+
+/* ── OKR Section ── */
+.workproject--DashboardOkrSection {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.workproject--DashboardOkrBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--background-secondary);
+}
+
+/* OKR Card */
+.workproject--OkrCard {
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.workproject--OkrCard:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.workproject--OkrCard:active {
+  transform: scale(0.99);
+  transition: transform 0.08s ease;
+}
+
+.workproject--OkrCardId {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--color-cyan);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.workproject--OkrCardText {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-normal);
+  margin-bottom: 8px;
+  word-break: break-word;
+  font-weight: 500;
+}
+
+/* OKR Progress */
+.workproject--OkrProgressWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workproject--OkrProgressBar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--background-modifier-border);
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.workproject--OkrProgressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.workproject--OkrProgressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  border-radius: 4px;
+}
+
+.workproject--OkrProgressLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 36px;
+  text-align: right;
+}
+
+.workproject--OkrToday {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 8px;
+  background: var(--background-secondary);
+  border-radius: 5px;
+  line-height: 1.3;
+}
+
+.workproject--EmptyOkr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 28px;
+  color: var(--text-faint);
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.workproject--ColumnCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: var(--color-cyan);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: auto;
+  letter-spacing: 0.02em;
+}
+
+/* ── Scrollbar ── */
+
+.workproject--CalendarDayBody::-webkit-scrollbar {
+  width: 3px;
+}
+.workproject--CalendarDayBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+.workproject--CalendarDayBody::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 2px;
+}
+
+.workproject--CalendarBoard::-webkit-scrollbar {
+  width: 5px;
+}
+.workproject--CalendarBoard::-webkit-scrollbar-track {
+  background: transparent;
+}
+.workproject--CalendarBoard::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 3px;
+}
+
+.workproject--DashboardBody::-webkit-scrollbar {
+  width: 4px;
+}
+.workproject--DashboardBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+.workproject--DashboardBody::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border);
+  border-radius: 2px;
+}
+
+/* ── Project Selector Focus ── */
+.workproject--ProjectSelect:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 600px) {
+  .workproject--Header {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+  .workproject--Title {
+    font-size: 15px;
+  }
+  .workproject--DateLabel {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  .workproject--StatCardsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .workproject--ChartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .workproject--CalendarCard,
+  .workproject--OkrCard,
+  .workproject--OkrProgressFill,
+  .workproject--StatCard,
+  .workproject--NavBtn,
+  .workproject--RefreshBtn,
+  .workproject--DashboardHeader {
+    transition: none !important;
+  }
+  .workproject--CalendarCard:hover,
+  .workproject--OkrCard:hover,
+  .workproject--StatCard:hover {
+    transform: none !important;
+  }
+}
+
+/* ════════════════════════════════════════
+   OKR Code Block Styles
+   Prefix: tasklist-okr-
+   ════════════════════════════════════════ */
+
+.tasklist-okr-block {
+  margin: var(--size-4-2) 0;
+  padding: var(--size-4-3);
+  background: var(--background-primary-alt);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+.tasklist-okr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tasklist-okr-card {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+}
+
+.tasklist-okr-card .tasklist-block-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.tasklist-okr-card-id {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius-s);
+  background: var(--color-cyan);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.tasklist-okr-card-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-normal);
+  margin-bottom: 6px;
+  padding-right: 60px;
+}
+
+.tasklist-okr-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tasklist-okr-progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--background-modifier-border);
+  overflow: hidden;
+}
+
+.tasklist-okr-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.tasklist-okr-progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+.tasklist-okr-today {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- Progress modal -- */
+.tasklist-progress-container {
+  margin-bottom: var(--size-4-3);
+}
+
+.tasklist-progress-label {
+  display: block;
+  margin-bottom: var(--size-4-1);
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.tasklist-progress-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+}
+
+.tasklist-progress-input {
+  padding: var(--size-4-1) var(--size-4-2);
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  font-size: var(--font-ui-medium);
+}
+
+.tasklist-modal-setting {
+  margin-bottom: var(--size-4-3);
+}
+
+.tasklist-modal-setting label {
+  display: block;
+  margin-bottom: var(--size-4-1);
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+}
+
+.tasklist-modal-row {
+  display: flex;
+  gap: var(--size-4-2);
+  margin-bottom: var(--size-4-3);
+}
+
+/* -- Header actions -- */
+.tasklist-block-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+}
+
+/* -- O-level summary row -- */
+.tasklist-okr-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  padding: var(--size-4-2) 0;
+  flex-wrap: wrap;
+}
+
+.tasklist-okr-progress-label-text {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* -- Badges (score & weight) -- */
+.tasklist-okr-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-medium);
+  flex-shrink: 0;
+}
+
+.tasklist-okr-badge-score {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.tasklist-okr-badge-weight {
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.tasklist-okr-badge-quarter {
+  background: var(--color-green);
+  color: var(--text-on-accent);
+  font-weight: 500;
+}
+
+/* -- O-level progress bar (slightly larger) -- */
+.tasklist-okr-progress-o {
+  flex: 1;
+  min-width: 120px;
+}
+
+.tasklist-okr-progress-o .tasklist-okr-progress-bar {
+  height: 8px;
+}
+
+/* -- KR card title row -- */
+.tasklist-okr-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-4-1);
+  margin-bottom: 6px;
+}
+
+.tasklist-okr-card-title {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-normal);
+  flex: 1;
+  min-width: 0;
+}
+
+/* -- Badges row (below progress bar) -- */
+.tasklist-okr-badge-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* -- KR card actions (inline, flex-shrink) -- */
+.tasklist-okr-card .tasklist-block-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  position: static;
+}
+
+/* -- Config button -- */
+.tasklist-okr-config-btn {
+  position: static;
+}
+
+/* -- Auto-generated ID display -- */
+.tasklist-okr-auto-id {
+  display: inline-block;
+  padding: var(--size-4-1) var(--size-4-3);
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-medium);
+  font-weight: var(--font-semibold);
+  color: var(--text-accent);
+  font-family: var(--font-monospace);
+}
+
+/* -- Empty state actions -- */
+.tasklist-okr-empty-text {
+  margin-bottom: var(--size-4-3);
+  color: var(--text-muted);
+}
+
+.tasklist-okr-empty-actions {
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tasklist-okr-empty-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-1) var(--size-4-3);
+  min-height: 36px;
+  border: none;
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-medium);
+  cursor: pointer;
+}
+
+.tasklist-okr-empty-actions button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.tasklist-okr-empty-actions button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+}
+
+.tasklist-okr-empty-actions button svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+}
+
+/* ===== Project Table (Settings) ===== */
+.tasklist-project-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 12px;
+  font-size: var(--font-ui-smaller);
+}
+.tasklist-project-table th {
+  text-align: left;
+  padding: 6px 8px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.tasklist-project-table td {
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+.tasklist-project-path {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Settings Tab Navigation ===== */
+.tasklist-settings-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 20px;
+  padding-bottom: 0;
+}
+.tasklist-settings-tab {
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+  border-radius: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tasklist-settings-tab:hover {
+  color: var(--text-normal);
+}
+.tasklist-settings-tab-active {
+  color: var(--text-accent);
+  border-bottom-color: var(--text-accent);
+}

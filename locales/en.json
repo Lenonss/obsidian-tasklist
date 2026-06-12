@@ -1,0 +1,334 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "refresh": "Refresh",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search tasks...",
+    "selectAll": "Select all",
+    "selected": "selected",
+    "more": "more",
+    "source": "Source"
+  },
+  "status": {
+    "pending": "Pending",
+    "in-progress": "In Progress",
+    "done": "Done"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "settings": {
+    "title": "TaskList Settings",
+    "language": {
+      "name": "Language",
+      "desc": "Interface display language",
+      "optionZh": "中文",
+      "optionEn": "English"
+    },
+    "databasePath": {
+      "name": "Database file path",
+      "desc": "SQLite database file path (relative to vault root). Stores all task data.",
+      "placeholder": "documents/work/tasks.db"
+    },
+    "defaultPriority": {
+      "name": "Default priority",
+      "desc": "Default priority for new tasks"
+    },
+    "defaultStatus": {
+      "name": "Default status",
+      "desc": "Default status for new tasks"
+    },
+    "workboardDefaults": "Workboard defaults",
+    "defaultWorkboardYear": {
+      "name": "Default year",
+      "desc": "Default year for new workboards and sync operations"
+    },
+    "defaultQuarter": {
+      "name": "Default quarter",
+      "desc": "Default quarter for new OKR objectives and sync operations"
+    },
+    "defaultTimeRange": {
+      "name": "Default time range",
+      "desc": "Default view for new workboards"
+    },
+    "timeRange": {
+      "week": "Week",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "showDashboard": {
+      "name": "Show dashboard",
+      "desc": "Show dashboard panel by default in new workboards"
+    },
+    "maxCards": {
+      "name": "Max cards per day",
+      "desc": "Maximum task cards visible per day in calendar view (1-100)"
+    },
+    "languageHint": "Re-open views for language changes to take effect.",
+    "projects": {
+      "title": "Project Management",
+      "add": "Add Project",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete project \"{{name}}\"? Database file will NOT be deleted.",
+      "name": "Name",
+      "namePlaceholder": "Project name",
+      "rootPath": "Root Path",
+      "rootPathPlaceholder": "Markdown root directory path",
+      "dbFileName": "DB File",
+      "dbFileNamePlaceholder": "project-name.db",
+      "enabled": "Enabled",
+      "activeProject": "Active Project",
+      "dataDir": {
+        "name": "Database storage directory",
+        "desc": "Central storage directory for all project database files (relative to vault root)",
+        "placeholder": ".tasklist/databases"
+      },
+      "noProjects": "No projects. Click \"Add Project\" to create one.",
+      "pathNotExist": "Directory does not exist. Continue?"
+    },
+    "mcp": {
+      "title": "MCP Server",
+      "install": "Install MCP Server",
+      "reinstall": "Reinstall",
+      "testConnection": "Test Connection",
+      "reregister": "Re-register in mcp.json",
+      "status": {
+        "installed": "✓ Installed",
+        "notInstalled": "✗ Not installed",
+        "depsMissing": "⚠ Dependencies missing",
+        "entriesMissing": "⚠ Some projects not registered",
+        "testing": "⏳ Testing...",
+        "testSuccess": "✓ Connection successful",
+        "testFailed": "✗ Connection failed",
+        "installing": "⏳ Installing..."
+      }
+    },
+    "skill": {
+      "title": "Skill",
+      "install": "Install Skill",
+      "update": "Update Skill",
+      "view": "View",
+      "status": {
+        "installed": "✓ Installed",
+        "notInstalled": "✗ Not installed"
+      }
+    }
+  },
+  "tasklist": {
+    "title": "Task List",
+    "add": "Add",
+    "refreshTooltip": "Refresh task list",
+    "filterStatus": {
+      "all": "All statuses",
+      "pending": "Pending",
+      "in-progress": "In Progress",
+      "done": "Done"
+    },
+    "filterPriority": {
+      "all": "All priorities",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "empty": "No tasks. Click \"Add\" to create your first task.",
+    "loadFailed": "Failed to load tasks. Check database file path in settings.",
+    "priorityLabel": "Priority",
+    "updated": "Updated",
+    "deleteConfirm": "Delete task",
+    "notices": {
+      "toggleFailed": "Failed to toggle status",
+      "saved": "Task saved",
+      "saveFailed": "Save failed. Task may have been deleted.",
+      "deleted": "Task deleted",
+      "deleteFailed": "Delete failed. Task may have been removed already."
+    }
+  },
+  "modal": {
+    "newTask": "New Task",
+    "editTask": "Edit Task",
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "taskTitle": {
+      "name": "Task title",
+      "desc": "Required, short summary",
+      "placeholder": "Enter task title"
+    },
+    "taskContent": {
+      "name": "Task content",
+      "desc": "Optional, details",
+      "placeholder": "Enter task details (optional)"
+    },
+    "priority": {
+      "name": "Priority",
+      "desc": "How important is this task"
+    },
+    "status": {
+      "name": "Status",
+      "desc": "Current status of this task"
+    },
+    "startDate": {
+      "name": "Start date",
+      "desc": "Task start date (leave empty for no date)"
+    },
+    "endDate": {
+      "name": "End date",
+      "desc": "Optional end date for multi-day tasks",
+      "placeholder": "Same as start date"
+    },
+    "notices": {
+      "titleRequired": "Task title is required",
+      "updated": "Task updated",
+      "created": "Task created",
+      "saveFailed": "Failed to save task"
+    }
+  },
+  "block": {
+    "title": "Task list",
+    "add": "Add",
+    "addTooltip": "Add task to this list",
+    "toggleTooltip": "Toggle status",
+    "editTooltip": "Edit task",
+    "deleteTooltip": "Delete task",
+    "unlinkTooltip": "Remove from this list only",
+    "emptyNoRefs": "No tasks referenced. Click \"Add\" to create one.",
+    "emptyDeleted": "Referenced tasks have been deleted from the database.",
+    "loadFailed": "Failed to load tasks from database."
+  },
+  "addPanel": {
+    "title": "Add tasks to list",
+    "createNew": "Create new task",
+    "pickFromDb": "Or pick from database:",
+    "emptyNone": "No tasks in database. Create one first.",
+    "emptyAllIncluded": "All database tasks are already in this list.",
+    "addSelected": "Add selected",
+    "notices": {
+      "noSelection": "No tasks selected",
+      "addFailed": "Failed to add tasks"
+    }
+  },
+  "okr": {
+    "noObjective": "No objective configured yet.",
+    "selectObjective": "Select Objective",
+    "createObjective": "Create Objective",
+    "loadFailed": "Failed to load OKR data.",
+    "objectiveNotFound": "Objective not found",
+    "configureObjective": "Configure objective",
+    "addKR": "Add KR",
+    "addKRTooltip": "Add KR to this list",
+    "progress": "Progress",
+    "score": "Score",
+    "weight": "Weight",
+    "noKRs": "No key results. Click \"Add KR\" to add key results.",
+    "updateKR": "Update KR",
+    "removeFromList": "Remove from list",
+    "addKeyResultsTitle": "Add Key Results",
+    "createNewKR": "Create new KR",
+    "pickFromDb": "Or pick from database:",
+    "noKRsFound": "No key results found for this objective. Create one above.",
+    "selectObjectiveTitle": "Select Objective",
+    "noObjectivesInDb": "No objectives in database. Run \"Sync OKR to database\" or create one first.",
+    "createObjectiveTitle": "Create Objective",
+    "year": "Year",
+    "quarter": "Quarter",
+    "objectiveId": "Objective ID",
+    "title": "Title (display)",
+    "text": "Text (description)",
+    "configureTitle": "Configure",
+    "progressPercent": "Progress (%)",
+    "weightPercent": "Weight (%)",
+    "todaysUpdate": "Today's update",
+    "todaysUpdatePlaceholder": "What was done today for this KR...",
+    "krId": "KR ID",
+    "krTitle": "Title",
+    "krText": "Text",
+    "target": "Target (optional)",
+    "owner": "Owner (optional)",
+    "createKRTtile": "Create Key Result",
+    "objectiveLabel": "Objective",
+    "updateTitle": "Update",
+    "notices": {
+      "krIdRequired": "KR ID is required",
+      "krTextRequired": "KR text is required",
+      "objectiveIdRequired": "Objective ID is required",
+      "objectiveTextRequired": "Objective text is required",
+      "invalidYear": "Please enter a valid year",
+      "noKRsSelected": "No KRs selected"
+    }
+  },
+  "workboard": {
+    "loading": "⏳ Loading...",
+    "opening": "Opening workboard...",
+    "title": "📊 Work Project",
+    "today": "📅 Today",
+    "prevWeek": "← Prev Week",
+    "nextWeek": "Next Week →",
+    "prevMonth": "← Prev Month",
+    "nextMonth": "Next Month →",
+    "prevQuarter": "← Prev Quarter",
+    "nextQuarter": "Next Quarter →",
+    "prevYear": "← Prev Year",
+    "nextYear": "Next Year →",
+    "weekLabel": "Week",
+    "monthLabel": "Month",
+    "quarterLabel": "Quarter",
+    "yearLabel": "Year",
+    "stats": {
+      "total": "Total",
+      "done": "Done",
+      "blocked": "Blocked",
+      "completionRate": "Rate"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "todayDone": "Today Done",
+      "inProgress": "In Progress",
+      "totalTasks": "Total Tasks",
+      "doneTrend": "Done Trend",
+      "taskDistribution": "Task Distribution",
+      "dailyDetail": "Daily Done Detail",
+      "todo": "Todo",
+      "done": "Done",
+      "blocked": "Blocked"
+    },
+    "okr": {
+      "title": "🎯 OKR Progress",
+      "empty": "No OKR data"
+    },
+    "dayMore": "+{{count}} more",
+    "monthMore": "+{{count}}",
+    "unnamedTask": "(Unnamed)",
+    "projectNotFound": "Bound project no longer exists, fell back to auto-detect"
+  },
+  "commands": {
+    "openTaskList": "Open task list",
+    "quickAddTask": "Quick add task",
+    "syncOkr": "Sync OKR to database",
+    "newWorkboard": "New workboard"
+  },
+  "menu": {
+    "addToTaskList": "Add to task list",
+    "createWorkboardHere": "Create workboard here",
+    "insertTaskList": "Insert task list",
+    "insertOkr": "Insert OKR",
+    "createTaskFromSelection": "Create task from selection"
+  },
+  "notices": {
+    "syncingOkr": "Syncing OKR data...",
+    "syncComplete": "Synced",
+    "taskCreated": "Task created",
+    "taskCreateFailed": "Failed to create task",
+    "workboardCreateFailed": "Failed to create workboard",
+    "titleRequired": "Task title is required"
+  }
+}
