@@ -115,7 +115,8 @@ export class TaskDatabase {
   private async doInit(): Promise<void> {
     try {
       // 1. Initialize SQL.js with embedded WASM (no external file needed)
-      this.SQL = await initSqlWithWasm();
+      const sql: SqlJsStatic = await initSqlWithWasm();
+      this.SQL = sql;
 
       // 2. Load or create the database file
       const dbPath = this.getDatabasePath();

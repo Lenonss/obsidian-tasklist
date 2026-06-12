@@ -7,7 +7,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import initSqlJs from 'sql.js';
-import type { Database as SqlDatabase } from 'sql.js';
+import type { Database as SqlDatabase, SqlJsStatic } from 'sql.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { getAllTools } from './tools/index.js';
@@ -51,14 +51,14 @@ async function main() {
   }
 
   // Initialize SQL.js
-  const SQL = await initSqlJs();
+  const SQL: SqlJsStatic = await initSqlJs();
   const dbBuffer = fs.readFileSync(resolvedDbPath);
   const db: SqlDatabase = new SQL.Database(new Uint8Array(dbBuffer));
 
   const ctx: McpContext = { db, rootPath, SQL };
 
   // Create MCP Server
-  const server = new Server(
+  const server: Server = new Server(
     { name: 'tasklist-mcp', version: '1.0.0' },
     { capabilities: { tools: {} } }
   );
@@ -111,7 +111,7 @@ async function main() {
   });
 
   // Connect via stdio
-  const transport = new StdioServerTransport();
+  const transport: StdioServerTransport = new StdioServerTransport();
   await server.connect(transport);
 
   console.error(`TaskList MCP Server running. DB: ${resolvedDbPath}, Root: ${rootPath}`);
