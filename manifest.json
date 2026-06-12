@@ -1,9 +1,9 @@
 {
-  "id": "tasklist",
-  "name": "TaskList",
-  "version": "1.0.2",
-  "minAppVersion": "1.5.0",
-  "description": "Centralized task management with SQLite database, inline code blocks, OKR tracking, and calendar workboard view.",
-  "author": "Lenonss",
-  "isDesktopOnly": false
+	"id": "tasklist",
+	"name": "TaskList",
+	"version": "1.0.3",
+	"minAppVersion": "1.6.0",
+	"description": "Centralized task management with SQLite database, inline code blocks, OKR tracking, and calendar workboard view.",
+	"author": "Lenonss",
+	"isDesktopOnly": false
 }
