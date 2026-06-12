@@ -1,11 +1,8 @@
 import { normalizePath, DataAdapter } from 'obsidian';
 import { Task, TaskStatus, Objective, KeyResult } from './types';
 import { generateUUID, getNowISO } from './utils';
-import initSqlJs from 'sql.js';
+import { initSqlWithWasm } from './wasm-embed';
 import type { Database as SqlDatabase, SqlJsStatic } from 'sql.js';
-
-// Path to the WASM file relative to the vault root
-const WASM_VAULT_PATH = '.obsidian/plugins/tasklist/sql-wasm.wasm';
 
 // Schema
 const SCHEMA_SQL = [
@@ -117,34 +114,19 @@ export class TaskDatabase {
 
   private async doInit(): Promise<void> {
     try {
-      // 1. Load WASM binary from the plugin directory
-      let wasmBinary: ArrayBuffer;
-      try {
-        wasmBinary = await this.vaultAdapter.readBinary(
-          WASM_VAULT_PATH
-        );
-      } catch {
-        // Fallback: try to read from a known alternative location
-        // This handles the case where the user hasn't copied the WASM yet
-        throw new Error(
-          'SQLite WASM not found at ' +
-            WASM_VAULT_PATH +
-            '. Please ensure sql-wasm.wasm is in the plugin directory.'
-        );
-      }
-
-      this.SQL = await initSqlJs({ wasmBinary });
+      // 1. Initialize SQL.js with embedded WASM (no external file needed)
+      this.SQL = await initSqlWithWasm();
 
       // 2. Load or create the database file
       const dbPath = this.getDatabasePath();
       try {
         const existingData =
           await this.vaultAdapter.readBinary(dbPath);
-        this.db = new this.SQL.Database(new Uint8Array(existingData));
+        this.db = new this.SQL!.Database(new Uint8Array(existingData));
       } catch {
         // File doesn't exist or can't be read — create a new database
         await this.ensureDatabaseParentDir(dbPath);
-        this.db = new this.SQL.Database();
+        this.db = new this.SQL!.Database();
       }
 
       // 3. Create schema (idempotent: IF NOT EXISTS)

@@ -2,3 +2,4 @@ node_modules/
 mcp/node_modules/
 .DS_Store
 *.log
+wasm-embed.ts

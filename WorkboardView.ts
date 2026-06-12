@@ -531,11 +531,11 @@ export class WorkboardView extends ItemView {
 
     for (const card of cards) {
       const c = row.createDiv({ cls: 'workproject--StatCard' });
-      c.createDiv({
+      const statVal = c.createDiv({
         text: card.value,
         cls: 'workproject--StatCardValue',
-        attr: { style: `color: ${card.color}` },
       });
+      statVal.setCssProps({ '--stat-color': card.color });
       c.createDiv({
         text: card.label,
         cls: 'workproject--StatCardLabel',
@@ -984,9 +984,12 @@ export class WorkboardView extends ItemView {
     const bar = progressWrap.createDiv({
       cls: 'workproject--OkrProgressBar',
     });
-    bar.createDiv({
+    const fillBar = bar.createDiv({
       cls: 'workproject--OkrProgressFill',
-      attr: { style: `width: ${pct}%; background-color: ${pColor}` },
+    });
+    fillBar.setCssProps({
+      '--progress-width': `${pct}%`,
+      '--progress-color': pColor,
     });
 
     progressWrap.createSpan({
@@ -1212,10 +1215,10 @@ export class WorkboardView extends ItemView {
       }
     });
 
-    card.createSpan({
+    const dot = card.createSpan({
       cls: 'workproject--CalendarCardDot',
-      attr: { style: `background-color: ${dotColor}` },
     });
+    dot.setCssProps({ '--dot-color': dotColor });
 
     card.createSpan({
       text: title,

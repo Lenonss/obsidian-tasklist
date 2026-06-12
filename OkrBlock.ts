@@ -202,11 +202,12 @@ export class OkrBlock extends MarkdownRenderChild {
     const bar = progressWrap.createDiv({
       cls: 'tasklist-okr-progress-bar',
     });
-    bar.createDiv({
+    const fill = bar.createDiv({
       cls: 'tasklist-okr-progress-fill',
-      attr: {
-        style: `width: ${pct}%; background-color: ${pColor}`,
-      },
+    });
+    fill.setCssProps({
+      '--progress-width': `${pct}%`,
+      '--progress-color': pColor,
     });
     progressWrap.createSpan({
       text: `${pct}%`,
@@ -293,11 +294,12 @@ export class OkrBlock extends MarkdownRenderChild {
     const bar = progressWrap.createDiv({
       cls: 'tasklist-okr-progress-bar',
     });
-    bar.createDiv({
+    const fill = bar.createDiv({
       cls: 'tasklist-okr-progress-fill',
-      attr: {
-        style: `width: ${pct}%; background-color: ${pColor}`,
-      },
+    });
+    fill.setCssProps({
+      '--progress-width': `${pct}%`,
+      '--progress-color': pColor,
     });
     progressWrap.createSpan({
       text: `${pct}%`,

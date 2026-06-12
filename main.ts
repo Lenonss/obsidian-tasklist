@@ -1,4 +1,4 @@
-import { Plugin, TFile, TFolder, Notice, WorkspaceLeaf, DataAdapter, normalizePath } from 'obsidian';
+import { Plugin, TFile, TFolder, Notice, WorkspaceLeaf, DataAdapter, normalizePath, Platform } from 'obsidian';
 import { TaskListSettings, DEFAULT_SETTINGS, VIEW_TYPE_TASKLIST, VIEW_TYPE_WORKBOARD, ProjectConfig } from './types';
 import { TaskListSettingTab } from './settings';
 import { TaskDatabase } from './TaskDatabase';
@@ -452,6 +452,7 @@ export default class TaskListPlugin extends Plugin {
    * Returns: 'installed' | 'depsMissing' | 'notInstalled'
    */
   detectMcpStatus(): 'installed' | 'depsMissing' | 'notInstalled' {
+    if (!Platform.isDesktop) return 'notInstalled';
     try {
       const fs = require('fs');
       const path = require('path');
@@ -482,6 +483,7 @@ export default class TaskListPlugin extends Plugin {
    * Install MCP Server dependencies via npm install.
    */
   async installMcpServer(): Promise<{ success: boolean; message: string }> {
+    if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP Server' };
     try {
       const { exec } = require('child_process');
       const path = require('path');
@@ -512,6 +514,7 @@ export default class TaskListPlugin extends Plugin {
    * Test MCP Server connection by spawning and calling get_project_info.
    */
   async testMcpConnection(): Promise<{ success: boolean; message: string; data?: any }> {
+    if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP 连接测试' };
     try {
       const { spawn } = require('child_process');
       const path = require('path');
@@ -595,6 +598,7 @@ export default class TaskListPlugin extends Plugin {
    * Register all enabled projects as MCP server entries in .claude/mcp.json.
    */
   async registerMcpEntries(): Promise<{ success: boolean; message: string }> {
+    if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP 注册' };
     try {
       const path = require('path');
       const fs = require('fs');
