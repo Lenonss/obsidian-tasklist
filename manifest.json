@@ -5,5 +5,5 @@
 	"description": "All-in-one project execution hub: SQLite database, inline task blocks, OKR tracking, calendar workboard, MCP server, and multi-project support.",
 	"author": "Lenonss",
 	"isDesktopOnly": false,
-	"version": "1.0.9"
+	"version": "1.0.10"
 }
