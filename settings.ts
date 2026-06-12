@@ -68,7 +68,7 @@ export class TaskListSettingTab extends PluginSettingTab {
   // ═══════════════════════════════════
 
   private renderBasicTab(el: HTMLElement): void {
-    el.createEl('h2', { text: t('settings.title') });
+    new Setting(el).setName(t('settings.title')).setHeading();
 
     new Setting(el)
       .setName(t('settings.language.name'))
@@ -127,7 +127,7 @@ export class TaskListSettingTab extends PluginSettingTab {
   // ═══════════════════════════════════
 
   private renderWorkboardTab(el: HTMLElement): void {
-    el.createEl('h2', { text: t('settings.workboardDefaults') });
+    new Setting(el).setName(t('settings.workboardDefaults')).setHeading();
 
     new Setting(el)
       .setName(t('settings.defaultWorkboardYear.name'))
@@ -208,7 +208,7 @@ export class TaskListSettingTab extends PluginSettingTab {
   // ═══════════════════════════════════
 
   private renderAITab(el: HTMLElement): void {
-    el.createEl('h2', { text: 'AI & 项目管理' });
+    new Setting(el).setName('AI & 项目管理').setHeading();
 
     new Setting(el)
       .setName(t('settings.projects.dataDir.name'))
@@ -244,7 +244,7 @@ export class TaskListSettingTab extends PluginSettingTab {
   // ───── MCP ─────
 
   private renderMcpSection(el: HTMLElement): void {
-    el.createEl('h3', { text: t('settings.mcp.title') });
+    new Setting(el).setName(t('settings.mcp.title')).setHeading();
 
     const mcpStatus = this.plugin.detectMcpStatus();
     el.createDiv({
@@ -279,7 +279,7 @@ export class TaskListSettingTab extends PluginSettingTab {
   // ───── Skill ─────
 
   private renderSkillSection(el: HTMLElement): void {
-    el.createEl('h3', { text: t('settings.skill.title') });
+    new Setting(el).setName(t('settings.skill.title')).setHeading();
 
     const skillStatus = this.plugin.detectSkillStatus();
     el.createDiv({
