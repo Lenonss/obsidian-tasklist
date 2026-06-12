@@ -39,7 +39,7 @@ export class TaskListBlock extends MarkdownRenderChild {
     this.ctx = ctx;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises -- MarkdownRenderChild onload must be async for data loading
   async onload() {
     await this.render();
   }

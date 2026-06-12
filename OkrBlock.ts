@@ -43,7 +43,7 @@ export class OkrBlock extends MarkdownRenderChild {
     this.ctx = ctx;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises -- MarkdownRenderChild onload must be async for data loading and render flow
   async onload() {
     // Auto-detect project from the source file path
     const sourcePath = this.ctx.sourcePath;
@@ -166,7 +166,7 @@ export class OkrBlock extends MarkdownRenderChild {
     });
     setIcon(configBtn, 'settings');
     configBtn.addEventListener('click', () => {
-      this.openOConfigModal(objective as Objective, config);
+      this.openOConfigModal(objective, config);
     });
 
     // Add KR button
@@ -177,7 +177,7 @@ export class OkrBlock extends MarkdownRenderChild {
     setIcon(addBtn, 'plus');
     addBtn.createSpan({ text: ' ' + t('okr.addKR') });
     addBtn.addEventListener('click', () => {
-      this.openAddPanel(objective as Objective, config);
+      this.openAddPanel(objective, config);
     });
 
     // ── O summary row ──

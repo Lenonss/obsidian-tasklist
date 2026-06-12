@@ -454,9 +454,9 @@ export default class TaskListPlugin extends Plugin {
   detectMcpStatus(): 'installed' | 'depsMissing' | 'notInstalled' {
     if (!Platform.isDesktop) return 'notInstalled';
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const fs: typeof import('fs') = require('fs');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const path: typeof import('path') = require('path');
       const vaultRoot = (this.app.vault.adapter as { basePath?: string }).basePath || '';
       const mcpDir = path.resolve(vaultRoot, 'Dev/Plugins/TaskList/mcp');
@@ -485,9 +485,9 @@ export default class TaskListPlugin extends Plugin {
   async installMcpServer(): Promise<{ success: boolean; message: string }> {
     if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP Server' };
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const { exec }: typeof import('child_process') = require('child_process');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const path: typeof import('path') = require('path');
       const mcpDir = path.resolve(this.getVaultRoot(), 'Dev/Plugins/TaskList/mcp');
 
@@ -518,9 +518,9 @@ export default class TaskListPlugin extends Plugin {
   async testMcpConnection(): Promise<{ success: boolean; message: string; data?: Record<string, unknown> }> {
     if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP 连接测试' };
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const { spawn }: typeof import('child_process') = require('child_process');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const path: typeof import('path') = require('path');
       const vaultRoot = this.getVaultRoot();
       const serverPath = path.join(vaultRoot, 'Dev/Plugins/TaskList/mcp/server.js');
@@ -604,9 +604,9 @@ export default class TaskListPlugin extends Plugin {
   async registerMcpEntries(): Promise<{ success: boolean; message: string }> {
     if (!Platform.isDesktop) return { success: false, message: '仅桌面端支持 MCP 注册' };
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const path: typeof import('path') = require('path');
-      // eslint-disable-next-line @typescript-eslint/no-var-requires, no-restricted-imports
+      // eslint-disable-next-line @typescript-eslint/no-var-requires -- Node.js require is intentional for Electron desktop-only MCP bridge
       const fs: typeof import('fs') = require('fs');
       const vaultRoot = this.getVaultRoot();
       const mcpJsonPath = path.join(vaultRoot, '.claude/mcp.json');

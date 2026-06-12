@@ -182,9 +182,9 @@ export class MigrationTool {
     for (const month of months) {
       const folderPath = normalizePath(`${basePath}/${month}`);
       const folder = this.plugin.app.vault.getAbstractFileByPath(folderPath);
-      if (!folder || !('children' in folder)) continue;
+      if (!(folder instanceof TFolder)) continue;
 
-      const children = (folder as TFolder).children as TFile[];
+      const children = folder.children as TFile[];
       for (const file of children) {
         if (file.extension !== 'md') continue;
 

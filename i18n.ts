@@ -3,9 +3,13 @@
  * Supports zh (Chinese) and en (English) with dot-notation key lookup.
  */
 
+/** Recursive locale dictionary: each key maps to a string or a nested sub-dictionary */
+interface LocaleDict {
+  [key: string]: string | LocaleDict;
+}
+
 // Module-level state — intentionally mutable for simplicity
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let locale: Record<string, any> = {};
+let locale: LocaleDict = {};
 let currentLanguage: string = 'zh';
 
 /**
@@ -24,7 +28,7 @@ export function initI18n(lang: string): void {
  * Set the current locale dictionary directly.
  * Used after importing JSON language packs.
  */
-export function setLocale(dict: Record<string, any>): void {
+export function setLocale(dict: LocaleDict): void {
   locale = dict;
 }
 
@@ -43,8 +47,7 @@ export function getLanguage(): string {
  */
 export function t(key: string): string {
   const parts = key.split('.');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let current: any = locale;
+  let current: string | LocaleDict = locale;
 
   for (const part of parts) {
     if (current == null || typeof current !== 'object') {

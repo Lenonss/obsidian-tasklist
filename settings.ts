@@ -15,7 +15,6 @@ export class TaskListSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
@@ -320,7 +319,7 @@ export class TaskListSettingTab extends PluginSettingTab {
         const tr = tbody.createEl('tr');
         const t0 = tr.createEl('td');
         const toggle = t0.createEl('input', { type: 'checkbox' });
-        if (toggle instanceof HTMLInputElement) toggle.checked = project.enabled;
+        if (toggle.instanceOf(HTMLInputElement)) toggle.checked = project.enabled;
         toggle.addEventListener('change', async () => {
           project.enabled = toggle.checked;
           await this.plugin.saveSettings();
@@ -334,8 +333,11 @@ export class TaskListSettingTab extends PluginSettingTab {
         ta.createEl('button', { text: t('settings.projects.edit') }).addEventListener('click', () => this.showProjectModal(project));
         const delBtn = ta.createEl('button', { text: t('settings.projects.delete'), cls: 'mod-warning' });
         delBtn.addEventListener('click', async () => {
-          // eslint-disable-next-line no-restricted-globals
-          if (confirm(t('settings.projects.deleteConfirm').replace('{{name}}', project.name))) {
+          const confirmed = await showConfirmModal(
+            this.app,
+            t('settings.projects.deleteConfirm').replace('{{name}}', project.name)
+          );
+          if (confirmed) {
             this.plugin.settings.projects = this.plugin.settings.projects.filter(p => p.id !== project.id);
             if (this.plugin.settings.activeProjectId === project.id) {
               const r = this.plugin.settings.projects.filter(p => p.enabled);
@@ -381,7 +383,7 @@ export class TaskListSettingTab extends PluginSettingTab {
         const errors = this.plugin.validateProject(project, existing?.id);
         if (errors.length > 0) { new Notice(errors[0]); return; }
         if (isEdit) {
-          const idx = this.plugin.settings.projects.findIndex(p => p.id === existing!.id);
+          const idx = this.plugin.settings.projects.findIndex(p => p.id === existing?.id);
           if (idx >= 0) this.plugin.settings.projects[idx] = project;
         } else {
           this.plugin.settings.projects.push(project);
@@ -394,4 +396,24 @@ export class TaskListSettingTab extends PluginSettingTab {
 
     modal.open();
   }
+}
+
+/** Show a confirm dialog using Obsidian Modal instead of browser confirm(). */
+function showConfirmModal(app: App, message: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const modal = new Modal(app);
+    modal.titleEl.setText('确认');
+    const c = modal.contentEl;
+    c.createDiv({ text: message, cls: 'setting-item-description' });
+    const btnRow = c.createDiv({ cls: 'tasklist-modal-buttons' });
+    btnRow.createEl('button', { text: '取消' }).addEventListener('click', () => {
+      modal.close();
+      resolve(false);
+    });
+    btnRow.createEl('button', { text: '删除', cls: 'mod-warning' }).addEventListener('click', () => {
+      modal.close();
+      resolve(true);
+    });
+    modal.open();
+  });
 }
