@@ -1,6 +1,6 @@
 import { App, Modal, Notice, Setting } from 'obsidian';
 import type TaskListPlugin from './main';
-import { Task, TaskPriority, TaskStatus } from './types';
+import { Task, TaskPriority, TaskStatus, TaskType } from './types';
 import { t } from './i18n';
 
 export interface TaskSubmitData {
@@ -8,6 +8,8 @@ export interface TaskSubmitData {
   content: string;
   priority: TaskPriority;
   status: TaskStatus;
+  taskType?: TaskType;
+  progressValue?: number;
   date?: string;
   dateEnd?: string;
 }
@@ -24,6 +26,13 @@ export class TaskModal extends Modal {
   private statusSelectEl!: HTMLSelectElement;
   private dateInputEl: HTMLInputElement | null = null;
   private dateEndInputEl: HTMLInputElement | null = null;
+  private taskTypeSelectEl!: HTMLSelectElement;
+  private progressSliderEl!: HTMLInputElement;
+  private progressValueDisplay!: HTMLElement;
+  private typeFieldsContainer!: HTMLElement;
+  private progressFieldEl!: HTMLElement;
+  private progressLabelInputEl!: HTMLInputElement;
+  private parentHintEl!: HTMLElement;
 
   constructor(
     app: App,
@@ -85,6 +94,65 @@ export class TaskModal extends Modal {
         }
       });
 
+    // Task type selector
+    new Setting(contentEl)
+      .setName(t('modal.taskType.name'))
+      .setDesc(t('modal.taskType.desc'))
+      .addDropdown((dropdown) => {
+        this.taskTypeSelectEl = dropdown.selectEl;
+        dropdown
+          .addOption('text', t('taskType.text'))
+          .addOption('progress', t('taskType.progress'))
+          .addOption('parent', t('taskType.parent'))
+          .setValue(this.existingTask?.taskType || 'text');
+        dropdown.onChange((value) => {
+          this.toggleTypeSpecificFields(value as TaskType);
+        });
+      });
+
+    // Type-specific fields container
+    this.typeFieldsContainer = contentEl.createDiv({ cls: 'tasklist-modal-type-fields' });
+
+    // Progress fields (visible only when type is 'progress')
+    this.progressFieldEl = this.typeFieldsContainer.createDiv();
+
+    new Setting(this.progressFieldEl)
+      .setName('进度标签')
+      .setDesc('进度条显示的标签文字（可选）')
+      .addText((text) => {
+        this.progressLabelInputEl = text.inputEl;
+        text.setPlaceholder('输入进度标签...');
+        if (this.existingTask?.taskType === 'progress') {
+          text.setValue(this.existingTask.content || '');
+        }
+      });
+
+    new Setting(this.progressFieldEl)
+      .setName(t('modal.progressValue.name'))
+      .setDesc(t('modal.progressValue.desc'))
+      .addSlider((slider) => {
+        slider.setLimits(0, 100, 5)
+          .setValue(this.existingTask?.progressValue ?? 0)
+          .setDynamicTooltip();
+        this.progressSliderEl = slider.sliderEl;
+        this.progressSliderEl.addClass('tasklist-modal-progress-slider');
+      });
+
+    // Progress value display
+    this.progressValueDisplay = this.progressFieldEl.createSpan({
+      cls: 'tasklist-card-progress-label',
+      text: (this.existingTask?.progressValue ?? 0) + '%',
+    });
+    this.progressSliderEl.addEventListener('input', () => {
+      this.progressValueDisplay.setText(this.progressSliderEl.value + '%');
+    });
+
+    // Parent hint
+    this.parentHintEl = this.typeFieldsContainer.createDiv({
+      text: t('tasklist.parentHint'),
+      cls: 'setting-item-description',
+    });
+
     // Priority field
     new Setting(contentEl)
       .setName(t('modal.priority.name'))
@@ -140,6 +208,11 @@ export class TaskModal extends Modal {
         });
     }
 
+    // Initialize type-specific field visibility
+    this.toggleTypeSpecificFields(
+      (this.existingTask?.taskType || 'text') as TaskType
+    );
+
     // Submit button
     const buttonContainer = contentEl.createDiv({
       cls: 'tasklist-modal-buttons',
@@ -171,6 +244,11 @@ export class TaskModal extends Modal {
     });
   }
 
+  private toggleTypeSpecificFields(taskType: TaskType) {
+    this.progressFieldEl.style.display = taskType === 'progress' ? '' : 'none';
+    this.parentHintEl.style.display = taskType === 'parent' ? '' : 'none';
+  }
+
   private async handleSubmit() {
     const title = this.titleInputEl.value.trim();
 
@@ -181,15 +259,22 @@ export class TaskModal extends Modal {
       return;
     }
 
-    const content = this.contentInputEl.value.trim();
+    const taskType = (this.taskTypeSelectEl?.value as TaskType) || 'text';
+    let content = this.contentInputEl.value.trim();
     const priority = this.prioritySelectEl.value as TaskPriority;
+    let progressValue = 0;
+
+    // For progress type: content is the label
+    if (taskType === 'progress') {
+      content = this.progressLabelInputEl?.value?.trim() || content;
+      progressValue = parseInt(this.progressSliderEl?.value || '0', 10);
+    }
 
     try {
       const dateVal = this.dateInputEl?.value || '';
       const dateEndVal = this.dateEndInputEl?.value || '';
 
       if (this.saveHandler) {
-        // Custom save handler (e.g., code block writes to file)
         const status = this.statusSelectEl
           ? (this.statusSelectEl.value as TaskStatus)
           : this.existingTask
@@ -197,12 +282,11 @@ export class TaskModal extends Modal {
             : this.plugin.settings.defaultStatus;
 
         await this.saveHandler({
-          title, content, priority, status,
+          title, content, priority, status, taskType, progressValue,
           date: dateVal || undefined,
           dateEnd: dateEndVal || undefined,
         });
       } else if (this.existingTask) {
-        // Edit mode — save to global SQLite database
         const status = this.statusSelectEl
           ? (this.statusSelectEl.value as TaskStatus)
           : this.existingTask.status;
@@ -213,16 +297,19 @@ export class TaskModal extends Modal {
           content,
           priority,
           status,
+          taskType,
+          progressValue,
         });
 
         new Notice(t('modal.notices.updated'));
       } else {
-        // Add mode — save to global SQLite database
         await this.plugin.taskDatabase.addTask({
           title,
           content,
           priority,
           status: this.plugin.settings.defaultStatus,
+          taskType,
+          progressValue,
           date: dateVal || undefined,
           dateEnd: dateEndVal || undefined,
         });

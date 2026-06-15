@@ -4,12 +4,15 @@ export type TaskStatus = 'pending' | 'in-progress' | 'done';
 export type Language = 'zh' | 'en';
 export type TaskPriority = 'high' | 'medium' | 'low';
 export type DailyTaskType = 'todo' | 'achievement' | 'blocker' | 'next';
+export type TaskType = 'text' | 'progress' | 'parent';
 export type TimeRange = 'week' | 'month' | 'quarter' | 'year';
 
 export interface Task {
   id: string;
   title: string;
   content: string;
+  taskType?: TaskType;
+  progressValue?: number;
   status: TaskStatus;
   priority: TaskPriority;
   createdAt: string;
@@ -19,6 +22,13 @@ export interface Task {
   dateEnd?: string;
   type?: DailyTaskType;
   sourceFile?: string;
+}
+
+export interface TaskRelation {
+  id: string;
+  parentId: string;
+  childId: string;
+  sortOrder: number;
 }
 
 export interface Objective {
@@ -92,6 +102,8 @@ export interface TaskListSettings {
   dataDir: string;
   projects: ProjectConfig[];
   activeProjectId: string;
+  // Task hierarchy
+  maxTaskDepth: number;
 }
 
 export const DEFAULT_SETTINGS: TaskListSettings = {
@@ -107,6 +119,7 @@ export const DEFAULT_SETTINGS: TaskListSettings = {
   dataDir: '.tasklist/databases',
   projects: [],
   activeProjectId: '',
+  maxTaskDepth: 3,
 };
 
 export const VIEW_TYPE_TASKLIST = 'tasklist-view';
@@ -133,4 +146,20 @@ export const STATUS_CYCLE: Record<TaskStatus, TaskStatus> = {
   'pending': 'in-progress',
   'in-progress': 'done',
   'done': 'pending',
+};
+
+/**
+ * Get translated task type label based on current language.
+ */
+export function getTaskTypeLabel(taskType: TaskType): string {
+  return t(`taskType.${taskType}`);
+}
+
+/**
+ * Color mapping for task type badges.
+ */
+export const TASK_TYPE_COLORS: Record<TaskType, string> = {
+  text: 'var(--text-muted)',
+  progress: 'var(--color-blue)',
+  parent: 'var(--color-purple)',
 };

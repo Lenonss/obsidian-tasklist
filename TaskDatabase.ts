@@ -79,6 +79,21 @@ const SCHEMA_V5_SQL = [
   `CREATE UNIQUE INDEX IF NOT EXISTS idx_keyresults_uuid ON key_results(uuid);`,
 ].join('\n');
 
+// Schema v6: task types + parent-child hierarchy
+const SCHEMA_V6_SQL = [
+  `ALTER TABLE tasks ADD COLUMN task_type TEXT DEFAULT 'text';`,
+  `ALTER TABLE tasks ADD COLUMN progress_value INTEGER DEFAULT 0;`,
+  `CREATE TABLE IF NOT EXISTS task_relations (
+    id TEXT PRIMARY KEY,
+    parent_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    child_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    sort_order INTEGER NOT NULL DEFAULT 0
+  );`,
+  `CREATE INDEX IF NOT EXISTS idx_task_relations_parent ON task_relations(parent_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_task_relations_child ON task_relations(child_id);`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS idx_task_relations_pair ON task_relations(parent_id, child_id);`,
+].join('\n');
+
 // Schema version meta table
 const SCHEMA_META_SQL = [
   `CREATE TABLE IF NOT EXISTS schema_meta (
@@ -148,6 +163,9 @@ export class TaskDatabase {
       // 3f. Auto-migrate to v5 if needed
       await this.migrateSchemaV5();
 
+      // 3g. Auto-migrate to v6 if needed
+      await this.migrateSchemaV6();
+
       // 5. Persist the initial database file if it was just created
       await this.persistDatabase();
     } catch (error) {
@@ -183,7 +201,7 @@ export class TaskDatabase {
     if (!this.db) return [];
 
     const stmt = this.db.prepare(
-      'SELECT id, title, content, status, priority, created_at, updated_at, date, date_end, type, source_file FROM tasks ORDER BY priority ASC, updated_at DESC'
+      'SELECT id, title, content, task_type, progress_value, status, priority, created_at, updated_at, date, date_end, type, source_file FROM tasks ORDER BY priority ASC, updated_at DESC'
     );
 
     const tasks: Task[] = [];
@@ -213,11 +231,13 @@ export class TaskDatabase {
     };
 
     this.db.run(
-      'INSERT INTO tasks (id, title, content, status, priority, date, date_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO tasks (id, title, content, task_type, progress_value, status, priority, date, date_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [
         task.id,
         task.title,
         task.content,
+        task.taskType || 'text',
+        task.progressValue ?? 0,
         task.status,
         task.priority,
         task.date || '',
@@ -240,8 +260,8 @@ export class TaskDatabase {
 
     const now = getNowISO();
     this.db.run(
-      'UPDATE tasks SET title = ?, content = ?, status = ?, priority = ?, updated_at = ? WHERE id = ?',
-      [task.title, task.content, task.status, task.priority, now, task.id]
+      'UPDATE tasks SET title = ?, content = ?, task_type = ?, progress_value = ?, status = ?, priority = ?, updated_at = ? WHERE id = ?',
+      [task.title, task.content, task.taskType || 'text', task.progressValue ?? 0, task.status, task.priority, now, task.id]
     );
 
     const changes = this.db.getRowsModified();
@@ -260,6 +280,9 @@ export class TaskDatabase {
     await this.ensureInit();
     if (!this.db) throw new Error('Database not initialized');
 
+    // Cascade: remove relations first
+    this.db.run('DELETE FROM task_relations WHERE parent_id = ? OR child_id = ?', [taskId, taskId]);
+
     this.db.run('DELETE FROM tasks WHERE id = ?', [taskId]);
 
     const changes = this.db.getRowsModified();
@@ -269,6 +292,234 @@ export class TaskDatabase {
     }
 
     return false;
+  }
+
+  // ───── Task Relations ─────
+
+  /**
+   * Add a parent-child relation between two tasks.
+   */
+  async addRelation(parentId: string, childId: string, sortOrder?: number): Promise<void> {
+    await this.ensureInit();
+    if (!this.db) throw new Error('Database not initialized');
+
+    const id = generateUUID();
+    const order = sortOrder ?? 0;
+    this.db.run(
+      'INSERT OR IGNORE INTO task_relations (id, parent_id, child_id, sort_order) VALUES (?, ?, ?, ?)',
+      [id, parentId, childId, order]
+    );
+    await this.persistDatabase();
+  }
+
+  /**
+   * Remove a parent-child relation by relation ID.
+   */
+  async removeRelation(relationId: string): Promise<void> {
+    await this.ensureInit();
+    if (!this.db) throw new Error('Database not initialized');
+
+    this.db.run('DELETE FROM task_relations WHERE id = ?', [relationId]);
+    await this.persistDatabase();
+  }
+
+  /**
+   * Find the relation ID for a parent-child pair.
+   */
+  async getRelationId(parentId: string, childId: string): Promise<string | null> {
+    await this.ensureInit();
+    if (!this.db) return null;
+
+    const stmt = this.db.prepare(
+      'SELECT id FROM task_relations WHERE parent_id = ? AND child_id = ?',
+      [parentId, childId]
+    );
+    if (stmt.step()) {
+      const id = stmt.getAsObject().id as string;
+      stmt.free();
+      return id;
+    }
+    stmt.free();
+    return null;
+  }
+
+  /**
+   * Get all child tasks of a parent, ordered by sort_order.
+   */
+  async getChildren(parentId: string): Promise<Task[]> {
+    await this.ensureInit();
+    if (!this.db) return [];
+
+    const stmt = this.db.prepare(
+      `SELECT t.id, t.title, t.content, t.task_type, t.progress_value,
+              t.status, t.priority, t.created_at, t.updated_at,
+              t.date, t.date_end, t.type, t.source_file
+       FROM task_relations tr
+       JOIN tasks t ON t.id = tr.child_id
+       WHERE tr.parent_id = ?
+       ORDER BY tr.sort_order ASC`,
+      [parentId]
+    );
+
+    const tasks: Task[] = [];
+    while (stmt.step()) {
+      tasks.push(this.rowToTask(stmt.getAsObject()));
+    }
+    stmt.free();
+    return tasks;
+  }
+
+  /**
+   * Get the parent task of a child, or null if it has no parent.
+   */
+  async getParent(childId: string): Promise<Task | null> {
+    await this.ensureInit();
+    if (!this.db) return null;
+
+    const stmt = this.db.prepare(
+      `SELECT t.id, t.title, t.content, t.task_type, t.progress_value,
+              t.status, t.priority, t.created_at, t.updated_at,
+              t.date, t.date_end, t.type, t.source_file
+       FROM task_relations tr
+       JOIN tasks t ON t.id = tr.parent_id
+       WHERE tr.child_id = ?
+       LIMIT 1`,
+      [childId]
+    );
+
+    if (stmt.step()) {
+      const task = this.rowToTask(stmt.getAsObject());
+      stmt.free();
+      return task;
+    }
+    stmt.free();
+    return null;
+  }
+
+  /**
+   * Get all ancestor IDs of a task, ordered from direct parent to root.
+   * Used for depth checking. Stops if it encounters stopAtId (cycle detection).
+   */
+  async getAncestorIds(taskId: string, stopAtId?: string): Promise<string[]> {
+    await this.ensureInit();
+    if (!this.db) return [];
+
+    const ancestors: string[] = [];
+    const visited = new Set<string>([taskId]);
+    let currentId = taskId;
+
+    while (true) {
+      const stmt = this.db.prepare(
+        'SELECT parent_id FROM task_relations WHERE child_id = ? LIMIT 1',
+        [currentId]
+      );
+      if (!stmt.step()) {
+        stmt.free();
+        break;
+      }
+      const parentId = stmt.getAsObject().parent_id as string;
+      stmt.free();
+
+      if (stopAtId && parentId === stopAtId) break;
+      if (visited.has(parentId)) break; // cycle detection
+      visited.add(parentId);
+      ancestors.push(parentId);
+      currentId = parentId;
+    }
+
+    return ancestors;
+  }
+
+  /**
+   * Get all child relation IDs for a parent, ordered by sort_order.
+   * Returns array of {id, childId, sortOrder}.
+   */
+  async getChildRelations(parentId: string): Promise<{ id: string; childId: string; sortOrder: number }[]> {
+    await this.ensureInit();
+    if (!this.db) return [];
+
+    const stmt = this.db.prepare(
+      'SELECT id, child_id, sort_order FROM task_relations WHERE parent_id = ? ORDER BY sort_order ASC',
+      [parentId]
+    );
+
+    const results: { id: string; childId: string; sortOrder: number }[] = [];
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row['id'] as string,
+        childId: row['child_id'] as string,
+        sortOrder: row['sort_order'] as number,
+      });
+    }
+    stmt.free();
+    return results;
+  }
+
+  /**
+   * Swap sort_order of two sibling relations (for up/down reordering).
+   */
+  async swapSortOrder(relationId1: string, relationId2: string): Promise<void> {
+    await this.ensureInit();
+    if (!this.db) throw new Error('Database not initialized');
+
+    const getOrder = (id: string): number | null => {
+      const stmt = this.db!.prepare('SELECT sort_order FROM task_relations WHERE id = ?', [id]);
+      if (stmt.step()) {
+        const val = stmt.getAsObject().sort_order as number;
+        stmt.free();
+        return val;
+      }
+      stmt.free();
+      return null;
+    };
+
+    const order1 = getOrder(relationId1);
+    const order2 = getOrder(relationId2);
+    if (order1 === null || order2 === null) return;
+
+    this.db.run('UPDATE task_relations SET sort_order = ? WHERE id = ?', [order2, relationId1]);
+    this.db.run('UPDATE task_relations SET sort_order = ? WHERE id = ?', [order1, relationId2]);
+    await this.persistDatabase();
+  }
+
+  /**
+   * Delete all relations where a task is the parent.
+   */
+  async deleteChildrenByParentId(parentId: string): Promise<void> {
+    await this.ensureInit();
+    if (!this.db) throw new Error('Database not initialized');
+
+    this.db.run('DELETE FROM task_relations WHERE parent_id = ?', [parentId]);
+    await this.persistDatabase();
+  }
+
+  /**
+   * Calculate and update the progress_value of a parent task
+   * based on the completion rate of its children.
+   * Cascades upward to ancestor parents.
+   */
+  async calculateParentProgress(parentId: string): Promise<void> {
+    await this.ensureInit();
+    if (!this.db) return;
+
+    const children = await this.getChildren(parentId);
+    const total = children.length;
+    const done = children.filter(c => c.status === 'done').length;
+    const progress = total === 0 ? 0 : Math.round((done / total) * 100);
+
+    this.db.run(
+      'UPDATE tasks SET progress_value = ?, updated_at = ? WHERE id = ?',
+      [progress, getNowISO(), parentId]
+    );
+
+    // Cascade upward: if this parent has a parent, update it too
+    const grandParent = await this.getParent(parentId);
+    if (grandParent) {
+      await this.calculateParentProgress(grandParent.id);
+    }
+
+    await this.persistDatabase();
   }
 
   /**
@@ -529,6 +780,45 @@ export class TaskDatabase {
   }
 
   /**
+   * Auto-migrate schema from v5 to v6.
+   * Adds task_type, progress_value columns and task_relations table.
+   */
+  private async migrateSchemaV6(): Promise<void> {
+    if (!this.db) return;
+
+    const versionStmt = this.db.prepare(
+      "SELECT value FROM schema_meta WHERE key = 'version'"
+    );
+    let currentVersion = '1';
+    if (versionStmt.step()) {
+      currentVersion = versionStmt.getAsObject().value as string;
+    }
+    versionStmt.free();
+
+    if (currentVersion !== '6') {
+      try {
+        const stmts = SCHEMA_V6_SQL.split(';\n')
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+        for (const sql of stmts) {
+          try {
+            this.db.run(sql + ';');
+          } catch {
+            // Column may already exist — ignore and continue
+          }
+        }
+        this.db.run(
+          "UPDATE schema_meta SET value = '6' WHERE key = 'version'"
+        );
+        await this.persistDatabase();
+        console.log('TaskList: Schema migrated to v6');
+      } catch (error) {
+        console.error('TaskList: Schema v6 migration failed:', error);
+      }
+    }
+  }
+
+  /**
    * Read tasks within a date range, optionally filtered by type.
    */
   async readTasksByDateRange(
@@ -540,7 +830,7 @@ export class TaskDatabase {
     if (!this.db) return [];
 
     let sql =
-      'SELECT id, title, content, status, priority, created_at, updated_at, date, date_end, type, source_file FROM tasks WHERE date != ? AND date <= ?';
+      'SELECT id, title, content, task_type, progress_value, status, priority, created_at, updated_at, date, date_end, type, source_file FROM tasks WHERE date != ? AND date <= ?';
     const params: string[] = ['', endDate];
 
     // Range-overlap logic:
@@ -623,8 +913,8 @@ export class TaskDatabase {
     // Insert new
     const id = generateUUID();
     this.db.run(
-      `INSERT INTO tasks (id, title, content, status, priority, date, type, source_file, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO tasks (id, title, content, task_type, progress_value, status, priority, date, type, source_file, created_at, updated_at)
+       VALUES (?, ?, ?, 'text', 0, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         task.title,
@@ -1106,6 +1396,8 @@ export class TaskDatabase {
       id: row['id'] as string,
       title: row['title'] as string,
       content: (row['content'] as string) || '',
+      taskType: (row['task_type'] as Task['taskType']) || 'text',
+      progressValue: (row['progress_value'] as number) || 0,
       status: (row['status'] as TaskStatus) || 'pending',
       priority: (row['priority'] as Task['priority']) || 'medium',
       createdAt: row['created_at'] as string,

@@ -74,6 +74,10 @@
       "desc": "日历视图每天可见的任务卡片上限（1-100）"
     },
     "languageHint": "切换语言后，已打开的视图需要重新打开才能生效。",
+    "maxTaskDepth": {
+      "name": "最大任务嵌套深度",
+      "desc": "父任务最多可嵌套的子任务层数 (1-10)"
+    },
     "projects": {
       "title": "项目管理",
       "add": "添加项目",
@@ -128,6 +132,16 @@
     "title": "任务列表",
     "add": "添加",
     "refreshTooltip": "刷新任务列表",
+    "expandTooltip": "展开查看详情",
+    "collapseTooltip": "收起",
+    "children": "子任务",
+    "addChild": "添加子任务",
+    "addChildTooltip": "为此任务添加子任务",
+    "moveUp": "上移",
+    "moveDown": "下移",
+    "noChildren": "暂无子任务",
+    "depthLimitReached": "已达到最大嵌套深度",
+    "parentHint": "子任务在展开后管理",
     "filterStatus": {
       "all": "全部状态",
       "pending": "未开始",
@@ -168,6 +182,14 @@
       "name": "任务内容",
       "desc": "可选，详细信息",
       "placeholder": "输入任务详情（可选）"
+    },
+    "taskType": {
+      "name": "任务类型",
+      "desc": "决定任务的交互方式"
+    },
+    "progressValue": {
+      "name": "进度",
+      "desc": "手动设置进度 (0-100)"
     },
     "priority": {
       "name": "优先级",
@@ -335,5 +357,10 @@
     "taskCreateFailed": "任务创建失败",
     "workboardCreateFailed": "看板创建失败",
     "titleRequired": "任务标题不能为空"
+  },
+  "taskType": {
+    "text": "文本",
+    "progress": "进度",
+    "parent": "父任务"
   }
 }

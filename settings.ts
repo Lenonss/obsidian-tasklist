@@ -122,6 +122,22 @@ export class TaskListSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    new Setting(el)
+      .setName(t('settings.maxTaskDepth.name'))
+      .setDesc(t('settings.maxTaskDepth.desc'))
+      .addText((text) =>
+        text
+          .setPlaceholder('3')
+          .setValue(String(this.plugin.settings.maxTaskDepth))
+          .onChange(async (value) => {
+            const v = parseInt(value, 10);
+            if (v >= 1 && v <= 10) {
+              this.plugin.settings.maxTaskDepth = v;
+              await this.plugin.saveSettings();
+            }
+          })
+      );
   }
 
   // ═══════════════════════════════════

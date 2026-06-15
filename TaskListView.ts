@@ -5,7 +5,7 @@ import {
   setIcon,
 } from 'obsidian';
 import type TaskListPlugin from './main';
-import { Task, getStatusLabel, getPriorityLabel } from './types';
+import { Task, getStatusLabel, getPriorityLabel, getTaskTypeLabel } from './types';
 import { TaskModal } from './TaskModal';
 import { t } from './i18n';
 
@@ -15,6 +15,8 @@ export class TaskListView extends ItemView {
   private plugin: TaskListPlugin;
   private tasks: Task[] = [];
   private listContainerEl!: HTMLElement;
+  private expandedTaskId: string | null = null;
+  private childrenCache: Map<string, Task[]> = new Map();
 
   constructor(leaf: WorkspaceLeaf, plugin: TaskListPlugin) {
     super(leaf);
@@ -176,7 +178,7 @@ export class TaskListView extends ItemView {
   private renderTaskCard(task: Task) {
     const card = this.listContainerEl.createDiv({ cls: 'tasklist-card' });
 
-    // Priority color indicator
+    // Priority color dot
     const priorityColors: Record<string, string> = {
       high: 'var(--text-error)',
       medium: 'var(--text-warning)',
@@ -190,60 +192,42 @@ export class TaskListView extends ItemView {
     });
     priorityDot.setAttr('aria-label', 'Priority: ' + getPriorityLabel(task.priority));
 
-    // Card body
-    const cardBody = card.createDiv({ cls: 'tasklist-card-body' });
+    // Card header (clickable row)
+    const header = card.createDiv({ cls: 'tasklist-card-header' });
 
-    // Task info row (title + status badge)
-    const infoRow = cardBody.createDiv({ cls: 'tasklist-card-info' });
-
-    infoRow.createEl('strong', {
+    // Title
+    header.createEl('strong', {
       text: task.title,
       cls: 'tasklist-card-title',
     });
 
-    infoRow.createSpan({
+    // Type badge
+    const taskType = (task.taskType || 'text') as 'text' | 'progress' | 'parent';
+    header.createSpan({
+      text: getTaskTypeLabel(taskType),
+      cls: `tasklist-type-badge tasklist-type-${taskType}`,
+    });
+
+    // Status badge
+    header.createSpan({
       text: getStatusLabel(task.status),
       cls: 'tasklist-status-badge tasklist-status-' + task.status,
-    });
-
-    // Task content (collapsible if long)
-    if (task.content) {
-      cardBody.createDiv({
-        text: task.content,
-        cls: 'tasklist-card-content',
-      });
-    }
-
-    // Card footer with metadata
-    const footer = cardBody.createDiv({ cls: 'tasklist-card-footer' });
-
-    footer.createSpan({
-      text: t('tasklist.priorityLabel') + ': ' + getPriorityLabel(task.priority),
-      cls: 'tasklist-card-meta',
-    });
-
-    footer.createSpan({
-      text: t('tasklist.updated') + ' ' + task.updatedAt.substring(0, 10),
-      cls: 'tasklist-card-meta tasklist-card-date',
     });
 
     // Action buttons
     const actions = card.createDiv({ cls: 'tasklist-card-actions' });
 
-    // Status toggle button
+    // Status toggle
     const statusBtn = actions.createEl('button', {
       cls: 'tasklist-btn tasklist-btn-toggle',
       attr: {
-        'aria-label':
-          t('block.toggleTooltip') +
-          ' (' +
-          getStatusLabel(task.status) +
-          ')',
+        'aria-label': t('block.toggleTooltip') + ' (' + getStatusLabel(task.status) + ')',
         'data-tooltip-position': 'top',
       },
     });
     setIcon(statusBtn, 'arrow-right-circle');
-    statusBtn.addEventListener('click', () => {
+    statusBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       void (async () => {
         await this.handleStatusToggle(task);
       })();
@@ -258,26 +242,23 @@ export class TaskListView extends ItemView {
       },
     });
     setIcon(editBtn, 'pencil');
-    editBtn.addEventListener('click', () => {
+    editBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       this.openEditTaskModal(task);
     });
 
-    // Save button
-    const saveBtn = actions.createEl('button', {
+    // Expand/Collapse button
+    const isExpanded = task.id === this.expandedTaskId;
+    const expandBtn = actions.createEl('button', {
       cls: 'tasklist-btn tasklist-btn-save',
       attr: {
-        'aria-label': t('common.save'),
+        'aria-label': isExpanded ? t('tasklist.collapseTooltip') : t('tasklist.expandTooltip'),
         'data-tooltip-position': 'top',
       },
     });
-    setIcon(saveBtn, 'save');
-    saveBtn.addEventListener('click', () => {
-      void (async () => {
-        await this.handleSaveTask(task);
-      })();
-    });
+    setIcon(expandBtn, isExpanded ? 'chevron-up' : 'chevron-down');
 
-    // Remove button
+    // Delete button
     const removeBtn = actions.createEl('button', {
       cls: 'tasklist-btn tasklist-btn-remove',
       attr: {
@@ -286,11 +267,315 @@ export class TaskListView extends ItemView {
       },
     });
     setIcon(removeBtn, 'trash-2');
-    removeBtn.addEventListener('click', () => {
+    removeBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       void (async () => {
         await this.handleDeleteTask(task);
       })();
     });
+
+    // Click card (not buttons) to expand/collapse
+    card.addEventListener('click', () => {
+      void this.toggleExpand(task, card);
+    });
+
+    // If expanded, render the expanded body
+    if (isExpanded) {
+      card.addClass('tasklist-card-expanded');
+      this.renderExpandedBody(card, task);
+    }
+  }
+
+  // ───── Expand/Collapse ─────
+
+  private async toggleExpand(task: Task, _card: HTMLElement) {
+    if (this.expandedTaskId === task.id) {
+      this.expandedTaskId = null;
+    } else {
+      // Pre-load children for parent tasks
+      if ((task.taskType || 'text') === 'parent') {
+        const children = await this.plugin.taskDatabase.getChildren(task.id);
+        this.childrenCache.set(task.id, children);
+      }
+      this.expandedTaskId = task.id;
+    }
+    // Re-render the whole list (handles accordion)
+    const statusFilter = (this.listContainerEl.parentElement?.querySelector('.tasklist-filter-select') as HTMLSelectElement)?.value || 'all';
+    this.renderTaskList(statusFilter);
+  }
+
+  // ───── Expanded Body ─────
+
+  private renderExpandedBody(card: HTMLElement, task: Task) {
+    const body = card.createDiv({ cls: 'tasklist-card-expanded-body' });
+    const taskType = (task.taskType || 'text') as 'text' | 'progress' | 'parent';
+
+    switch (taskType) {
+      case 'text':
+        this.renderTextExpanded(body, task);
+        break;
+      case 'progress':
+        this.renderProgressExpanded(body, task);
+        break;
+      case 'parent':
+        this.renderParentExpanded(body, task);
+        break;
+    }
+
+    // Footer metadata
+    const footer = body.createDiv({ cls: 'tasklist-card-footer' });
+    footer.createSpan({
+      text: t('tasklist.priorityLabel') + ': ' + getPriorityLabel(task.priority),
+      cls: 'tasklist-card-meta',
+    });
+    footer.createSpan({
+      text: t('tasklist.updated') + ' ' + task.updatedAt.substring(0, 10),
+      cls: 'tasklist-card-meta tasklist-card-date',
+    });
+  }
+
+  // ───── Text Expanded ─────
+
+  private renderTextExpanded(container: HTMLElement, task: Task) {
+    const textarea = container.createEl('textarea', {
+      cls: 'tasklist-modal-content',
+      attr: { rows: '4' },
+    });
+    textarea.value = task.content || '';
+
+    const saveBtn = container.createEl('button', {
+      text: t('common.save'),
+      cls: 'mod-cta tasklist-card-inline-save',
+    });
+    saveBtn.addEventListener('click', async () => {
+      task.content = textarea.value;
+      await this.plugin.taskDatabase.updateTask(task);
+      new Notice(t('tasklist.notices.saved'));
+    });
+  }
+
+  // ───── Progress Expanded ─────
+
+  private renderProgressExpanded(container: HTMLElement, task: Task) {
+    // Label input (uses content field)
+    const labelInput = container.createEl('input', {
+      type: 'text',
+      cls: 'tasklist-modal-title',
+      placeholder: t('modal.taskContent.placeholder'),
+    });
+    labelInput.value = task.content || '';
+
+    // Progress bar
+    const progressWrap = container.createDiv({ cls: 'tasklist-card-progress-wrap' });
+    const bar = progressWrap.createDiv({ cls: 'tasklist-card-progress-bar' });
+    const fill = bar.createDiv({ cls: 'tasklist-card-progress-fill' });
+    const label = progressWrap.createSpan({ cls: 'tasklist-card-progress-label' });
+
+    const updateProgressDisplay = (val: number) => {
+      fill.setCssProps({
+        '--progress-width': val + '%',
+        '--progress-color':
+          val >= 75 ? 'var(--color-green)' :
+          val >= 40 ? 'var(--color-blue)' :
+          'var(--text-error)',
+      });
+      label.setText(val + '%');
+    };
+
+    const currentVal = task.progressValue ?? 0;
+    updateProgressDisplay(currentVal);
+
+    // Slider
+    const sliderDiv = container.createDiv({ cls: 'tasklist-card-progress-slider' });
+    const slider = sliderDiv.createEl('input', {
+      type: 'range',
+      attr: { min: '0', max: '100', step: '5' },
+    });
+    slider.value = String(currentVal);
+
+    slider.addEventListener('input', () => {
+      updateProgressDisplay(parseInt(slider.value, 10));
+    });
+
+    // Save button
+    const saveBtn = container.createEl('button', {
+      text: t('common.save'),
+      cls: 'mod-cta tasklist-card-inline-save',
+    });
+    saveBtn.addEventListener('click', async () => {
+      task.content = labelInput.value;
+      task.progressValue = parseInt(slider.value, 10);
+      await this.plugin.taskDatabase.updateTask(task);
+      new Notice(t('tasklist.notices.saved'));
+    });
+  }
+
+  // ───── Parent Expanded ─────
+
+  private renderParentExpanded(container: HTMLElement, task: Task) {
+    const children = this.childrenCache.get(task.id) || [];
+    const doneCount = children.filter(c => c.status === 'done').length;
+    const progress = children.length > 0
+      ? Math.round((doneCount / children.length) * 100)
+      : 0;
+
+    // Auto-calculated progress bar
+    const progressWrap = container.createDiv({ cls: 'tasklist-card-progress-wrap' });
+    const bar = progressWrap.createDiv({ cls: 'tasklist-card-progress-bar' });
+    const fill = bar.createDiv({ cls: 'tasklist-card-progress-fill' });
+    const pLabel = progressWrap.createSpan({ cls: 'tasklist-card-progress-label' });
+
+    fill.setCssProps({
+      '--progress-width': progress + '%',
+      '--progress-color':
+        progress >= 75 ? 'var(--color-green)' :
+        progress >= 40 ? 'var(--color-blue)' :
+        'var(--text-error)',
+    });
+    pLabel.setText(doneCount + '/' + children.length);
+
+    // Subtask list
+    if (children.length > 0) {
+      const list = container.createDiv({ cls: 'tasklist-subtask-list' });
+
+      for (let i = 0; i < children.length; i++) {
+        this.renderSubtaskRow(list, children[i], task, i);
+      }
+    } else {
+      container.createDiv({
+        text: t('tasklist.noChildren'),
+        cls: 'setting-item-description',
+      });
+    }
+
+    // Add child button
+    const addRow = container.createDiv({ cls: 'tasklist-subtask-add-row' });
+    const addBtn = addRow.createEl('button', {
+      text: '+ ' + t('tasklist.addChild'),
+      cls: 'tasklist-btn',
+    });
+    addBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      this.showAddChildInline(container, task);
+    });
+  }
+
+  // ───── Subtask Row ─────
+
+  private renderSubtaskRow(
+    container: HTMLElement,
+    child: Task,
+    _parent: Task,
+    _index: number,
+  ) {
+    const row = container.createDiv({ cls: 'tasklist-subtask-item' });
+
+    // Status checkbox
+    const checkbox = row.createEl('input', {
+      type: 'checkbox',
+    });
+    if (child.status === 'done') {
+      checkbox.checked = true;
+    }
+    checkbox.addEventListener('click', (evt) => evt.stopPropagation());
+    checkbox.addEventListener('change', async () => {
+      child.status = checkbox.checked ? 'done' : 'pending';
+      await this.plugin.taskDatabase.updateTask(child);
+      // Update parent progress
+      if (this.expandedTaskId) {
+        await this.plugin.taskDatabase.calculateParentProgress(this.expandedTaskId);
+        await this.refresh();
+      }
+    });
+
+    // Type badge
+    const cType = (child.taskType || 'text') as 'text' | 'progress' | 'parent';
+    row.createSpan({
+      text: getTaskTypeLabel(cType),
+      cls: `tasklist-type-badge tasklist-type-${cType}`,
+    });
+
+    // Title
+    row.createSpan({
+      text: child.title,
+      cls: 'tasklist-subtask-title',
+    });
+
+    // Status badge
+    row.createSpan({
+      text: getStatusLabel(child.status),
+      cls: 'tasklist-status-badge tasklist-status-' + child.status,
+    });
+
+    // Hover actions
+    const actions = row.createDiv({ cls: 'tasklist-subtask-actions' });
+
+    const editBtn = actions.createEl('button', {
+      cls: 'tasklist-btn-small',
+      attr: { 'aria-label': t('block.editTooltip') },
+    });
+    setIcon(editBtn, 'pencil');
+    editBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      this.openEditTaskModal(child);
+    });
+
+    const delBtn = actions.createEl('button', {
+      cls: 'tasklist-btn-small tasklist-btn-remove-small',
+      attr: { 'aria-label': t('common.delete') },
+    });
+    setIcon(delBtn, 'trash-2');
+    delBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      void (async () => {
+        await this.handleDeleteTask(child);
+      })();
+    });
+  }
+
+  // ───── Inline Add Child ─────
+
+  private showAddChildInline(container: HTMLElement, parent: Task) {
+    // Remove existing add row
+    const existing = container.querySelector('.tasklist-subtask-add-inline');
+    if (existing) existing.remove();
+
+    const addRow = container.createDiv({ cls: 'tasklist-subtask-add-row tasklist-subtask-add-inline' });
+    const input = addRow.createEl('input', {
+      type: 'text',
+      cls: 'tasklist-modal-title',
+      placeholder: t('modal.taskTitle.placeholder'),
+    });
+    input.focus();
+
+    const confirmBtn = addRow.createEl('button', {
+      text: t('common.create'),
+      cls: 'mod-cta',
+    });
+    confirmBtn.addEventListener('click', async () => {
+      const title = input.value.trim();
+      if (!title) {
+        new Notice(t('modal.notices.titleRequired'));
+        return;
+      }
+      const child = await this.plugin.taskDatabase.addTask({
+        title,
+        content: '',
+        priority: parent.priority,
+        status: 'pending',
+        taskType: 'text',
+        progressValue: 0,
+      });
+      const children = this.childrenCache.get(parent.id) || [];
+      await this.plugin.taskDatabase.addRelation(parent.id, child.id, children.length);
+      await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+      await this.refresh();
+    });
+
+    const cancelBtn = addRow.createEl('button', {
+      text: t('common.cancel'),
+    });
+    cancelBtn.addEventListener('click', () => addRow.remove());
   }
 
   private openAddTaskModal() {
@@ -325,8 +610,39 @@ export class TaskListView extends ItemView {
   }
 
   private async handleDeleteTask(task: Task) {
-    const confirmed = await this.showDeleteConfirm(task);
-    if (!confirmed) return;
+    // Check for children and warn
+    if ((task.taskType || 'text') === 'parent') {
+      const children = await this.plugin.taskDatabase.getChildren(task.id);
+      if (children.length > 0) {
+        const confirmed = await this.showDeleteConfirm(task);
+        if (!confirmed) return;
+        // Cascade delete children
+        await this.plugin.taskDatabase.deleteChildrenByParentId(task.id);
+        for (const child of children) {
+          await this.plugin.taskDatabase.deleteTask(child.id);
+        }
+      } else {
+        const confirmed = await this.showDeleteConfirm(task);
+        if (!confirmed) return;
+      }
+    } else {
+      // Check if this is a child — if so, recalculate parent progress after delete
+      const parent = await this.plugin.taskDatabase.getParent(task.id);
+      const confirmed = await this.showDeleteConfirm(task);
+      if (!confirmed) return;
+
+      const success = await this.plugin.taskDatabase.deleteTask(task.id);
+      if (success && parent) {
+        await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+      }
+      if (success) {
+        new Notice(t('tasklist.notices.deleted'));
+        await this.refresh();
+      } else {
+        new Notice(t('tasklist.notices.deleteFailed'));
+      }
+      return;
+    }
 
     const success = await this.plugin.taskDatabase.deleteTask(task.id);
     if (success) {

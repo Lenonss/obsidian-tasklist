@@ -74,6 +74,10 @@
       "desc": "Maximum task cards visible per day in calendar view (1-100)"
     },
     "languageHint": "Re-open views for language changes to take effect.",
+    "maxTaskDepth": {
+      "name": "Max task nesting depth",
+      "desc": "Maximum number of nested subtask levels (1-10)"
+    },
     "projects": {
       "title": "Project Management",
       "add": "Add Project",
@@ -128,6 +132,16 @@
     "title": "Task List",
     "add": "Add",
     "refreshTooltip": "Refresh task list",
+    "expandTooltip": "Expand to view details",
+    "collapseTooltip": "Collapse",
+    "children": "Subtasks",
+    "addChild": "Add subtask",
+    "addChildTooltip": "Add a subtask for this task",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "noChildren": "No subtasks",
+    "depthLimitReached": "Maximum nesting depth reached",
+    "parentHint": "Manage subtasks in expanded view",
     "filterStatus": {
       "all": "All statuses",
       "pending": "Pending",
@@ -168,6 +182,14 @@
       "name": "Task content",
       "desc": "Optional, details",
       "placeholder": "Enter task details (optional)"
+    },
+    "taskType": {
+      "name": "Task type",
+      "desc": "Determines how the task interacts"
+    },
+    "progressValue": {
+      "name": "Progress",
+      "desc": "Set progress manually (0-100)"
     },
     "priority": {
       "name": "Priority",
@@ -335,5 +357,10 @@
     "taskCreateFailed": "Failed to create task",
     "workboardCreateFailed": "Failed to create workboard",
     "titleRequired": "Task title is required"
+  },
+  "taskType": {
+    "text": "Text",
+    "progress": "Progress",
+    "parent": "Parent"
   }
 }

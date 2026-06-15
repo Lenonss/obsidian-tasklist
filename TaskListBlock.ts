@@ -5,7 +5,7 @@ import {
   setIcon,
 } from 'obsidian';
 import type TaskListPlugin from './main';
-import { Task, getStatusLabel, getPriorityLabel } from './types';
+import { Task, getStatusLabel, getPriorityLabel, getTaskTypeLabel } from './types';
 import { TaskModal, TaskSubmitData } from './TaskModal';
 import { TaskAddPanel } from './TaskAddPanel';
 import { t } from './i18n';
@@ -153,7 +153,15 @@ export class TaskListBlock extends MarkdownRenderChild {
       text: task.title,
       cls: 'tasklist-block-task-title',
     });
-    if (task.content) {
+
+    // Type badge
+    const taskType = (task.taskType || 'text') as 'text' | 'progress' | 'parent';
+    info.createSpan({
+      text: getTaskTypeLabel(taskType),
+      cls: `tasklist-type-badge tasklist-type-${taskType}`,
+    });
+
+    if (task.content && taskType !== 'progress') {
       info.createSpan({
         text: ' — ' + task.content.substring(0, 80),
         cls: 'tasklist-block-task-content',
@@ -205,7 +213,7 @@ export class TaskListBlock extends MarkdownRenderChild {
     setIcon(editBtn, 'pencil');
     editBtn.addEventListener('click', () => this.openEditModal(task));
 
-    // Delete (from DB + remove ref from block)
+    // Delete
     const delBtn = actions.createEl('button', {
       cls: 'tasklist-btn-small tasklist-btn-remove-small',
       attr: {
@@ -221,7 +229,7 @@ export class TaskListBlock extends MarkdownRenderChild {
       })();
     });
 
-    // Remove from this list only (keep in DB)
+    // Unlink
     const unlinkBtn = actions.createEl('button', {
       cls: 'tasklist-btn-small',
       attr: {
