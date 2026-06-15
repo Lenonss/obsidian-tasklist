@@ -21,18 +21,19 @@ export class TaskModal extends Modal {
   private saveHandler: ((data: TaskSubmitData) => Promise<void>) | null;
 
   private titleInputEl!: HTMLInputElement;
+  private contentTextWrapper!: HTMLElement;
+  private contentProgressWrapper!: HTMLElement;
+  private contentParentWrapper!: HTMLElement;
   private contentInputEl!: HTMLTextAreaElement;
+  private parentContentTextareaEl!: HTMLTextAreaElement;
+  private taskTypeSelectEl!: HTMLSelectElement;
+  private progressSliderEl!: HTMLInputElement;
+  private progressValueDisplay!: HTMLElement;
+  private progressLabelInputEl!: HTMLInputElement;
   private prioritySelectEl!: HTMLSelectElement;
   private statusSelectEl!: HTMLSelectElement;
   private dateInputEl: HTMLInputElement | null = null;
   private dateEndInputEl: HTMLInputElement | null = null;
-  private taskTypeSelectEl!: HTMLSelectElement;
-  private progressSliderEl!: HTMLInputElement;
-  private progressValueDisplay!: HTMLElement;
-  private typeFieldsContainer!: HTMLElement;
-  private progressFieldEl!: HTMLElement;
-  private progressLabelInputEl!: HTMLInputElement;
-  private parentHintEl!: HTMLElement;
 
   constructor(
     app: App,
@@ -80,21 +81,7 @@ export class TaskModal extends Modal {
         });
       });
 
-    // Content field
-    new Setting(contentEl)
-      .setName(t('modal.taskContent.name'))
-      .setDesc(t('modal.taskContent.desc'))
-      .addTextArea((textArea) => {
-        this.contentInputEl = textArea.inputEl;
-        this.contentInputEl.addClass('tasklist-modal-content');
-        textArea.setPlaceholder(t('modal.taskContent.placeholder'));
-
-        if (this.existingTask) {
-          textArea.setValue(this.existingTask.content);
-        }
-      });
-
-    // Task type selector
+    // Task type selector (moved before content)
     new Setting(contentEl)
       .setName(t('modal.taskType.name'))
       .setDesc(t('modal.taskType.desc'))
@@ -106,17 +93,31 @@ export class TaskModal extends Modal {
           .addOption('parent', t('taskType.parent'))
           .setValue(this.existingTask?.taskType || 'text');
         dropdown.onChange((value) => {
-          this.toggleTypeSpecificFields(value as TaskType);
+          this.renderContentByType(value as TaskType);
         });
       });
 
-    // Type-specific fields container
-    this.typeFieldsContainer = contentEl.createDiv({ cls: 'tasklist-modal-type-fields' });
+    // ─── Content area (switches based on type) ───
+    const contentContainer = contentEl.createDiv({ cls: 'tasklist-modal-content-container' });
 
-    // Progress fields (visible only when type is 'progress')
-    this.progressFieldEl = this.typeFieldsContainer.createDiv();
+    // Text type content
+    this.contentTextWrapper = contentContainer.createDiv();
+    new Setting(this.contentTextWrapper)
+      .setName(t('modal.taskContent.name'))
+      .setDesc(t('modal.taskContent.desc'))
+      .addTextArea((textArea) => {
+        this.contentInputEl = textArea.inputEl;
+        this.contentInputEl.addClass('tasklist-modal-content');
+        textArea.setPlaceholder(t('modal.taskContent.placeholder'));
+        if (this.existingTask) {
+          textArea.setValue(this.existingTask.content);
+        }
+      });
 
-    new Setting(this.progressFieldEl)
+    // Progress type content
+    this.contentProgressWrapper = contentContainer.createDiv();
+
+    new Setting(this.contentProgressWrapper)
       .setName('进度标签')
       .setDesc('进度条显示的标签文字（可选）')
       .addText((text) => {
@@ -127,7 +128,7 @@ export class TaskModal extends Modal {
         }
       });
 
-    new Setting(this.progressFieldEl)
+    new Setting(this.contentProgressWrapper)
       .setName(t('modal.progressValue.name'))
       .setDesc(t('modal.progressValue.desc'))
       .addSlider((slider) => {
@@ -138,8 +139,7 @@ export class TaskModal extends Modal {
         this.progressSliderEl.addClass('tasklist-modal-progress-slider');
       });
 
-    // Progress value display
-    this.progressValueDisplay = this.progressFieldEl.createSpan({
+    this.progressValueDisplay = this.contentProgressWrapper.createSpan({
       cls: 'tasklist-card-progress-label',
       text: (this.existingTask?.progressValue ?? 0) + '%',
     });
@@ -147,11 +147,30 @@ export class TaskModal extends Modal {
       this.progressValueDisplay.setText(this.progressSliderEl.value + '%');
     });
 
-    // Parent hint
-    this.parentHintEl = this.typeFieldsContainer.createDiv({
+    // Parent type content
+    this.contentParentWrapper = contentContainer.createDiv();
+
+    new Setting(this.contentParentWrapper)
+      .setName(t('modal.taskContent.name'))
+      .setDesc(t('modal.taskContent.desc'))
+      .addTextArea((textArea) => {
+        this.parentContentTextareaEl = textArea.inputEl;
+        this.parentContentTextareaEl.addClass('tasklist-modal-content');
+        textArea.setPlaceholder('对父任务的补充说明（可选）');
+        if (this.existingTask?.taskType === 'parent') {
+          textArea.setValue(this.existingTask.content || '');
+        }
+      });
+
+    this.contentParentWrapper.createDiv({
       text: t('tasklist.parentHint'),
       cls: 'setting-item-description',
     });
+
+    // Initialize correct content UI
+    this.renderContentByType(
+      (this.existingTask?.taskType || 'text') as TaskType
+    );
 
     // Priority field
     new Setting(contentEl)
@@ -208,11 +227,6 @@ export class TaskModal extends Modal {
         });
     }
 
-    // Initialize type-specific field visibility
-    this.toggleTypeSpecificFields(
-      (this.existingTask?.taskType || 'text') as TaskType
-    );
-
     // Submit button
     const buttonContainer = contentEl.createDiv({
       cls: 'tasklist-modal-buttons',
@@ -244,9 +258,10 @@ export class TaskModal extends Modal {
     });
   }
 
-  private toggleTypeSpecificFields(taskType: TaskType) {
-    this.progressFieldEl.style.display = taskType === 'progress' ? '' : 'none';
-    this.parentHintEl.style.display = taskType === 'parent' ? '' : 'none';
+  private renderContentByType(taskType: TaskType) {
+    this.contentTextWrapper.style.display = taskType === 'text' ? '' : 'none';
+    this.contentProgressWrapper.style.display = taskType === 'progress' ? '' : 'none';
+    this.contentParentWrapper.style.display = taskType === 'parent' ? '' : 'none';
   }
 
   private async handleSubmit() {
@@ -260,14 +275,17 @@ export class TaskModal extends Modal {
     }
 
     const taskType = (this.taskTypeSelectEl?.value as TaskType) || 'text';
-    let content = this.contentInputEl.value.trim();
+    let content = '';
     const priority = this.prioritySelectEl.value as TaskPriority;
     let progressValue = 0;
 
-    // For progress type: content is the label
     if (taskType === 'progress') {
-      content = this.progressLabelInputEl?.value?.trim() || content;
+      content = this.progressLabelInputEl?.value?.trim() || '';
       progressValue = parseInt(this.progressSliderEl?.value || '0', 10);
+    } else if (taskType === 'parent') {
+      content = this.parentContentTextareaEl?.value?.trim() || '';
+    } else {
+      content = this.contentInputEl?.value?.trim() || '';
     }
 
     try {
