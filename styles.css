@@ -706,6 +706,147 @@ input.tasklist-input-error {
   color: var(--text-error);
 }
 
+/* ===== Block Parent/Child UI ===== */
+
+/* -- Expanded parent row -- */
+.tasklist-block-row-parent {
+  cursor: pointer;
+}
+
+.tasklist-block-row-parent.tasklist-block-expanded {
+  background: var(--background-modifier-hover);
+}
+
+/* -- Block expanded body (child area) -- */
+.tasklist-block-expanded-body {
+  padding: var(--size-4-2) var(--size-4-2) var(--size-4-2) var(--size-4-6);
+  background: var(--background-primary-alt);
+  border-left: 2px solid var(--interactive-accent);
+  margin: 2px 0 4px var(--size-4-3);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+}
+
+/* -- Block progress bar -- */
+.tasklist-block-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  margin: 0 0 var(--size-4-2) 0;
+}
+
+.tasklist-block-progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--background-modifier-border);
+  overflow: hidden;
+}
+
+.tasklist-block-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: var(--progress-width);
+  background: var(--progress-color);
+}
+
+.tasklist-block-progress-label {
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* -- Block child task list -- */
+.tasklist-block-child-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--size-4-1);
+}
+
+.tasklist-block-child-item {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  padding: var(--size-2-2) var(--size-4-2);
+  border-radius: var(--radius-s);
+  transition: background 0.1s;
+  min-height: 30px;
+}
+
+.tasklist-block-child-item:hover {
+  background: var(--background-modifier-hover);
+}
+
+.tasklist-block-child-item input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--interactive-accent);
+}
+
+.tasklist-block-child-title {
+  flex: 1;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasklist-block-child-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tasklist-block-child-item:hover .tasklist-block-child-actions {
+  opacity: 1;
+}
+
+/* -- Block child add row -- */
+.tasklist-block-child-add-row {
+  display: flex;
+  gap: var(--size-4-1);
+  align-items: center;
+  margin-top: var(--size-4-1);
+}
+
+.tasklist-block-child-add-row input {
+  flex: 1;
+  min-height: 28px;
+}
+
+.tasklist-block-add-child-btn {
+  width: auto !important;
+  padding: 0 var(--size-4-2) !important;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.tasklist-block-add-child-btn:hover {
+  color: var(--text-accent);
+  background: var(--background-modifier-hover);
+}
+
+/* -- Block child empty state -- */
+.tasklist-block-child-empty {
+  padding: var(--size-4-2) 0;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* -- Block expand button in row -- */
+.tasklist-block-expand-btn {
+  flex-shrink: 0;
+}
+
 /* ===== TaskAddPanel Styles ===== */
 
 .tasklist-add-panel {

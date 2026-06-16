@@ -98,7 +98,7 @@ export class TaskListView extends ItemView {
     });
     statusFilter.createEl('option', { text: t('tasklist.filterStatus.done'), value: 'done' });
     statusFilter.addEventListener('change', () => {
-      this.renderTaskList(statusFilter.value);
+      this.renderTaskList(statusFilter.value, priorityFilter.value);
     });
 
     const priorityFilter = filterBar.createEl('select', {
@@ -113,7 +113,7 @@ export class TaskListView extends ItemView {
     priorityFilter.createEl('option', { text: t('tasklist.filterPriority.medium'), value: 'medium' });
     priorityFilter.createEl('option', { text: t('tasklist.filterPriority.low'), value: 'low' });
     priorityFilter.addEventListener('change', () => {
-      this.renderTaskList(statusFilter.value);
+      this.renderTaskList(statusFilter.value, priorityFilter.value);
     });
 
     // Task list container
@@ -126,7 +126,7 @@ export class TaskListView extends ItemView {
   async refresh() {
     try {
       this.tasks = await this.plugin.taskDatabase.readTasks();
-      this.renderTaskList('all');
+      this.renderTaskList('all', 'all');
     } catch (error) {
       console.error('Failed to load tasks:', error);
       this.listContainerEl.empty();
@@ -137,7 +137,7 @@ export class TaskListView extends ItemView {
     }
   }
 
-  private renderTaskList(statusFilter: string) {
+  private renderTaskList(statusFilter: string, priorityFilter: string = 'all') {
     this.listContainerEl.empty();
 
     // Apply filters
@@ -145,6 +145,11 @@ export class TaskListView extends ItemView {
     if (statusFilter !== 'all') {
       filteredTasks = filteredTasks.filter(
         (t) => t.status === statusFilter
+      );
+    }
+    if (priorityFilter !== 'all') {
+      filteredTasks = filteredTasks.filter(
+        (t) => t.priority === priorityFilter
       );
     }
 
@@ -300,8 +305,10 @@ export class TaskListView extends ItemView {
       this.expandedTaskId = task.id;
     }
     // Re-render the whole list (handles accordion)
-    const statusFilter = (this.listContainerEl.parentElement?.querySelector('.tasklist-filter-select') as HTMLSelectElement)?.value || 'all';
-    this.renderTaskList(statusFilter);
+    const selects = this.listContainerEl.parentElement?.querySelectorAll('.tasklist-filter-select');
+    const statusFilter = (selects?.[0] as HTMLSelectElement)?.value || 'all';
+    const priorityFilter = (selects?.[1] as HTMLSelectElement)?.value || 'all';
+    this.renderTaskList(statusFilter, priorityFilter);
   }
 
   // ───── Expanded Body ─────

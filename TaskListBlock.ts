@@ -3,6 +3,7 @@ import {
   MarkdownPostProcessorContext,
   TFile,
   setIcon,
+  Notice,
 } from 'obsidian';
 import type TaskListPlugin from './main';
 import { Task, getStatusLabel, getPriorityLabel, getTaskTypeLabel } from './types';
@@ -37,6 +38,9 @@ export class TaskListBlock extends MarkdownRenderChild {
     this.plugin = plugin;
     this.ctx = ctx;
   }
+
+  private expandedTaskId: string | null = null;
+  private childrenCache: Map<string, Task[]> = new Map();
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises -- MarkdownRenderChild onload must be async for data loading
   async onload() {
@@ -128,11 +132,31 @@ export class TaskListBlock extends MarkdownRenderChild {
     const list = el.createDiv({ cls: 'tasklist-block-list' });
     for (const task of matched) {
       this.renderRow(list, task);
+      if (task.id === this.expandedTaskId && (task.taskType || 'text') === 'parent') {
+        this.renderBlockExpandedBody(list, task);
+      }
     }
   }
 
   private renderRow(container: HTMLElement, task: Task) {
+    const taskType = (task.taskType || 'text') as 'text' | 'progress' | 'parent';
+    const isExpanded = task.id === this.expandedTaskId;
+
     const row = container.createDiv({ cls: 'tasklist-block-row' });
+
+    if (taskType === 'parent') {
+      row.addClass('tasklist-block-row-parent');
+      row.setAttr('data-task-id', task.id);
+      if (isExpanded) {
+        row.addClass('tasklist-block-expanded');
+      }
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', (evt) => {
+        const target = evt.target as HTMLElement;
+        if (target.closest('button')) return;
+        void this.toggleExpand(task);
+      });
+    }
 
     // Priority dot
     const colors: Record<string, string> = {
@@ -155,7 +179,6 @@ export class TaskListBlock extends MarkdownRenderChild {
     });
 
     // Type badge
-    const taskType = (task.taskType || 'text') as 'text' | 'progress' | 'parent';
     info.createSpan({
       text: getTaskTypeLabel(taskType),
       cls: `tasklist-type-badge tasklist-type-${taskType}`,
@@ -186,6 +209,22 @@ export class TaskListBlock extends MarkdownRenderChild {
     // Actions
     const actions = row.createDiv({ cls: 'tasklist-block-actions' });
 
+    // Expand/Collapse button — only for parent type tasks
+    if (taskType === 'parent') {
+      const expandBtn = actions.createEl('button', {
+        cls: 'tasklist-btn-small tasklist-block-expand-btn',
+        attr: {
+          'aria-label': isExpanded ? t('tasklist.collapseTooltip') : t('tasklist.expandTooltip'),
+          'data-tooltip-position': 'top',
+        },
+      });
+      setIcon(expandBtn, isExpanded ? 'chevron-up' : 'chevron-down');
+      expandBtn.addEventListener('click', (evt) => {
+        evt.stopPropagation();
+        void this.toggleExpand(task);
+      });
+    }
+
     // Toggle status
     const toggleBtn = actions.createEl('button', {
       cls: 'tasklist-btn-small',
@@ -195,7 +234,8 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(toggleBtn, 'arrow-right-circle');
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       void (async () => {
         await this.plugin.taskDatabase.cycleTaskStatus(task.id);
         await this.render();
@@ -211,7 +251,10 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(editBtn, 'pencil');
-    editBtn.addEventListener('click', () => this.openEditModal(task));
+    editBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      this.openEditModal(task);
+    });
 
     // Delete
     const delBtn = actions.createEl('button', {
@@ -222,7 +265,8 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(delBtn, 'trash-2');
-    delBtn.addEventListener('click', () => {
+    delBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       void (async () => {
         await this.plugin.taskDatabase.deleteTask(task.id);
         await this.render();
@@ -238,12 +282,218 @@ export class TaskListBlock extends MarkdownRenderChild {
       },
     });
     setIcon(unlinkBtn, 'link-2-off');
-    unlinkBtn.addEventListener('click', () => {
+    unlinkBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       void (async () => {
         await this.removeIdFromBlock(task.id);
         await this.render();
       })();
     });
+  }
+
+  // ───── Expand/Collapse ─────
+
+  private async toggleExpand(task: Task) {
+    if (this.expandedTaskId === task.id) {
+      this.expandedTaskId = null;
+    } else {
+      // Pre-load children for parent tasks
+      if ((task.taskType || 'text') === 'parent') {
+        try {
+          const children = await this.plugin.taskDatabase.getChildren(task.id);
+          this.childrenCache.set(task.id, children);
+        } catch (err) {
+          console.error('TaskList: Failed to load children', err);
+          new Notice(t('tasklist.loadFailed'));
+          return;
+        }
+      }
+      this.expandedTaskId = task.id;
+    }
+    await this.render();
+  }
+
+  // ───── Expanded Block Body ─────
+
+  private renderBlockExpandedBody(container: HTMLElement, task: Task) {
+    const wrapper = container.createDiv({ cls: 'tasklist-block-expanded-body' });
+    const children = this.childrenCache.get(task.id) || [];
+    const doneCount = children.filter(c => c.status === 'done').length;
+    const progress = children.length > 0
+      ? Math.round((doneCount / children.length) * 100)
+      : 0;
+
+    // Progress bar
+    const progressWrap = wrapper.createDiv({ cls: 'tasklist-block-progress-wrap' });
+    const bar = progressWrap.createDiv({ cls: 'tasklist-block-progress-bar' });
+    const fill = bar.createDiv({ cls: 'tasklist-block-progress-fill' });
+    const pLabel = progressWrap.createSpan({ cls: 'tasklist-block-progress-label' });
+
+    fill.setCssProps({
+      '--progress-width': progress + '%',
+      '--progress-color':
+        progress >= 75 ? 'var(--color-green)' :
+        progress >= 40 ? 'var(--color-blue)' :
+        'var(--text-error)',
+    });
+    pLabel.setText(doneCount + '/' + children.length);
+
+    // Child task list
+    if (children.length > 0) {
+      const list = wrapper.createDiv({ cls: 'tasklist-block-child-list' });
+      for (const child of children) {
+        this.renderBlockChildRow(list, child, task);
+      }
+    } else {
+      wrapper.createDiv({
+        text: t('tasklist.noChildren'),
+        cls: 'tasklist-block-child-empty',
+      });
+    }
+
+    // Add child button
+    const addRow = wrapper.createDiv({ cls: 'tasklist-block-child-add-row' });
+    const addBtn = addRow.createEl('button', {
+      text: '  ' + t('tasklist.addChild'),
+      cls: 'tasklist-btn-small tasklist-block-add-child-btn',
+    });
+    setIcon(addBtn, 'plus');
+    addBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      this.showBlockAddChildInline(wrapper, task);
+    });
+  }
+
+  // ───── Block Child Row ─────
+
+  private renderBlockChildRow(
+    container: HTMLElement,
+    child: Task,
+    _parent: Task,
+  ) {
+    const row = container.createDiv({ cls: 'tasklist-block-child-item' });
+
+    // Status checkbox
+    const checkbox = row.createEl('input', {
+      type: 'checkbox',
+    });
+    if (child.status === 'done') {
+      checkbox.checked = true;
+    }
+    checkbox.addEventListener('click', (evt) => evt.stopPropagation());
+    checkbox.addEventListener('change', async () => {
+      child.status = checkbox.checked ? 'done' : 'pending';
+      await this.plugin.taskDatabase.updateTask(child);
+      if (this.expandedTaskId) {
+        await this.plugin.taskDatabase.calculateParentProgress(this.expandedTaskId);
+        await this.render();
+      }
+    });
+
+    // Type badge
+    const cType = (child.taskType || 'text') as 'text' | 'progress' | 'parent';
+    row.createSpan({
+      text: getTaskTypeLabel(cType),
+      cls: `tasklist-type-badge tasklist-type-${cType}`,
+    });
+
+    // Title
+    row.createSpan({
+      text: child.title,
+      cls: 'tasklist-block-child-title',
+    });
+
+    // Status badge
+    row.createSpan({
+      text: getStatusLabel(child.status),
+      cls: 'tasklist-status-badge tasklist-status-' + child.status,
+    });
+
+    // Hover actions
+    const actions = row.createDiv({ cls: 'tasklist-block-child-actions' });
+
+    const editBtn = actions.createEl('button', {
+      cls: 'tasklist-btn-small',
+      attr: { 'aria-label': t('block.editTooltip') },
+    });
+    setIcon(editBtn, 'pencil');
+    editBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      new TaskModal(this.plugin.app, this.plugin, child, async () => {
+        if (this.expandedTaskId) {
+          await this.plugin.taskDatabase.calculateParentProgress(this.expandedTaskId);
+        }
+        await this.render();
+      }).open();
+    });
+
+    const delBtn = actions.createEl('button', {
+      cls: 'tasklist-btn-small tasklist-btn-remove-small',
+      attr: { 'aria-label': t('common.delete') },
+    });
+    setIcon(delBtn, 'trash-2');
+    delBtn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
+      void (async () => {
+        await this.plugin.taskDatabase.deleteTask(child.id);
+        if (this.expandedTaskId) {
+          await this.plugin.taskDatabase.calculateParentProgress(this.expandedTaskId);
+        }
+        await this.render();
+      })();
+    });
+  }
+
+  // ───── Block Inline Add Child ─────
+
+  private showBlockAddChildInline(container: HTMLElement, parent: Task) {
+    // Remove existing inline form if any
+    const existing = container.querySelector('.tasklist-block-child-add-inline');
+    if (existing) existing.remove();
+
+    const addRow = container.createDiv({
+      cls: 'tasklist-block-child-add-row tasklist-block-child-add-inline',
+    });
+    const input = addRow.createEl('input', {
+      type: 'text',
+      cls: 'tasklist-modal-title',
+      placeholder: t('modal.taskTitle.placeholder'),
+    });
+    input.focus();
+
+    const confirmBtn = addRow.createEl('button', {
+      text: t('common.create'),
+      cls: 'mod-cta',
+    });
+    confirmBtn.addEventListener('click', async () => {
+      const title = input.value.trim();
+      if (!title) {
+        new Notice(t('modal.notices.titleRequired'));
+        return;
+      }
+      try {
+        const child = await this.plugin.taskDatabase.addTask({
+          title,
+          content: '',
+          priority: parent.priority,
+          status: 'pending',
+          taskType: 'text',
+          progressValue: 0,
+        });
+        const children = this.childrenCache.get(parent.id) || [];
+        await this.plugin.taskDatabase.addRelation(parent.id, child.id, children.length);
+        await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+        await this.render();
+      } catch (err) {
+        console.error('TaskList: Failed to create child task', err);
+        new Notice(t('tasklist.notices.saveFailed'));
+      }
+    });
+
+    const cancelBtn = addRow.createEl('button', {
+      text: t('common.cancel'),
+    });
+    cancelBtn.addEventListener('click', () => addRow.remove());
   }
 
   // ───── Code block source: parse / write ─────
