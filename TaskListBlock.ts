@@ -150,7 +150,6 @@ export class TaskListBlock extends MarkdownRenderChild {
       if (isExpanded) {
         row.addClass('tasklist-block-expanded');
       }
-      row.style.cursor = 'pointer';
       row.addEventListener('click', (evt) => {
         const target = evt.target as HTMLElement;
         if (target.closest('button')) return;
