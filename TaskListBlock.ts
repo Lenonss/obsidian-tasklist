@@ -268,6 +268,8 @@ export class TaskListBlock extends MarkdownRenderChild {
       evt.stopPropagation();
       void (async () => {
         await this.plugin.taskDatabase.deleteTask(task.id);
+        // Invalidate cache if the deleted task was a parent
+        this.childrenCache.delete(task.id);
         await this.render();
       })();
     });
@@ -437,6 +439,12 @@ export class TaskListBlock extends MarkdownRenderChild {
         await this.plugin.taskDatabase.deleteTask(child.id);
         if (this.expandedTaskId) {
           await this.plugin.taskDatabase.calculateParentProgress(this.expandedTaskId);
+          // Remove deleted child from parent's cache so refresh shows updated list
+          const cachedChildren = this.childrenCache.get(this.expandedTaskId);
+          if (cachedChildren) {
+            const updated = cachedChildren.filter(c => c.id !== child.id);
+            this.childrenCache.set(this.expandedTaskId, updated);
+          }
         }
         await this.render();
       })();
@@ -482,6 +490,9 @@ export class TaskListBlock extends MarkdownRenderChild {
         const children = this.childrenCache.get(parent.id) || [];
         await this.plugin.taskDatabase.addRelation(parent.id, child.id, children.length);
         await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+        // Sync cache so renderBlockExpandedBody shows the new child immediately
+        children.push(child);
+        this.childrenCache.set(parent.id, children);
         await this.render();
       } catch (err) {
         console.error('TaskList: Failed to create child task', err);

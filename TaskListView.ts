@@ -17,6 +17,8 @@ export class TaskListView extends ItemView {
   private listContainerEl!: HTMLElement;
   private expandedTaskId: string | null = null;
   private childrenCache: Map<string, Task[]> = new Map();
+  private statusFilterEl!: HTMLSelectElement;
+  private priorityFilterEl!: HTMLSelectElement;
 
   constructor(leaf: WorkspaceLeaf, plugin: TaskListPlugin) {
     super(leaf);
@@ -97,8 +99,9 @@ export class TaskListView extends ItemView {
       value: 'in-progress',
     });
     statusFilter.createEl('option', { text: t('tasklist.filterStatus.done'), value: 'done' });
+    this.statusFilterEl = statusFilter;
     statusFilter.addEventListener('change', () => {
-      this.renderTaskList(statusFilter.value, priorityFilter.value);
+      this.renderTaskList(this.statusFilterEl.value, this.priorityFilterEl.value);
     });
 
     const priorityFilter = filterBar.createEl('select', {
@@ -112,8 +115,9 @@ export class TaskListView extends ItemView {
     priorityFilter.createEl('option', { text: t('tasklist.filterPriority.high'), value: 'high' });
     priorityFilter.createEl('option', { text: t('tasklist.filterPriority.medium'), value: 'medium' });
     priorityFilter.createEl('option', { text: t('tasklist.filterPriority.low'), value: 'low' });
+    this.priorityFilterEl = priorityFilter;
     priorityFilter.addEventListener('change', () => {
-      this.renderTaskList(statusFilter.value, priorityFilter.value);
+      this.renderTaskList(this.statusFilterEl.value, this.priorityFilterEl.value);
     });
 
     // Task list container
@@ -125,8 +129,11 @@ export class TaskListView extends ItemView {
 
   async refresh() {
     try {
+      // Preserve current filter state from stored element references
+      const statusFilter = this.statusFilterEl?.value || 'all';
+      const priorityFilter = this.priorityFilterEl?.value || 'all';
       this.tasks = await this.plugin.taskDatabase.readTasks();
-      this.renderTaskList('all', 'all');
+      this.renderTaskList(statusFilter, priorityFilter);
     } catch (error) {
       console.error('Failed to load tasks:', error);
       this.listContainerEl.empty();
@@ -305,9 +312,8 @@ export class TaskListView extends ItemView {
       this.expandedTaskId = task.id;
     }
     // Re-render the whole list (handles accordion)
-    const selects = this.listContainerEl.parentElement?.querySelectorAll('.tasklist-filter-select');
-    const statusFilter = (selects?.[0] as HTMLSelectElement)?.value || 'all';
-    const priorityFilter = (selects?.[1] as HTMLSelectElement)?.value || 'all';
+    const statusFilter = this.statusFilterEl?.value || 'all';
+    const priorityFilter = this.priorityFilterEl?.value || 'all';
     this.renderTaskList(statusFilter, priorityFilter);
   }
 
@@ -576,6 +582,9 @@ export class TaskListView extends ItemView {
       const children = this.childrenCache.get(parent.id) || [];
       await this.plugin.taskDatabase.addRelation(parent.id, child.id, children.length);
       await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+      // Sync cache so renderParentExpanded shows the new child immediately
+      children.push(child);
+      this.childrenCache.set(parent.id, children);
       await this.refresh();
     });
 
@@ -632,6 +641,8 @@ export class TaskListView extends ItemView {
         const confirmed = await this.showDeleteConfirm(task);
         if (!confirmed) return;
       }
+      // Invalidate cache for the deleted parent
+      this.childrenCache.delete(task.id);
     } else {
       // Check if this is a child — if so, recalculate parent progress after delete
       const parent = await this.plugin.taskDatabase.getParent(task.id);
@@ -641,6 +652,12 @@ export class TaskListView extends ItemView {
       const success = await this.plugin.taskDatabase.deleteTask(task.id);
       if (success && parent) {
         await this.plugin.taskDatabase.calculateParentProgress(parent.id);
+        // Remove deleted child from parent's cache so refresh shows updated list
+        const cachedChildren = this.childrenCache.get(parent.id);
+        if (cachedChildren) {
+          const updated = cachedChildren.filter(c => c.id !== task.id);
+          this.childrenCache.set(parent.id, updated);
+        }
       }
       if (success) {
         new Notice(t('tasklist.notices.deleted'));
