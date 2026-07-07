@@ -648,6 +648,8 @@ export class TaskListBlock extends MarkdownRenderChild {
           content: data.content,
           priority: data.priority,
           status: data.status,
+          taskType: data.taskType,
+          progressValue: data.progressValue,
           date: data.date,
           dateEnd: data.dateEnd,
         });
