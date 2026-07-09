@@ -230,13 +230,21 @@
   "addPanel": {
     "title": "添加任务到列表",
     "createNew": "创建新任务",
+    "linkedTasks": "当前列表中的任务：",
+    "emptyLinked": "当前列表还没有任务。",
     "pickFromDb": "或从数据库中选择：",
     "emptyNone": "数据库中没有任务，请先创建一个。",
     "emptyAllIncluded": "数据库中的任务已全部在此列表中。",
     "addSelected": "添加所选",
+    "deleteConfirm": "确定要从数据库删除任务",
+    "deleteTaskAria": "从数据库删除任务",
+    "confirmDeleteAria": "确认删除此任务",
+    "cancelDeleteAria": "取消删除任务",
     "notices": {
       "noSelection": "未选择任务",
-      "addFailed": "添加任务失败"
+      "addFailed": "添加任务失败",
+      "deleteSuccess": "任务已删除",
+      "deleteFailed": "删除任务失败"
     }
   },
   "okr": {
