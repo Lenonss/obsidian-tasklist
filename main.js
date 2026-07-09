@@ -4935,7 +4935,7 @@ var import_obsidian6 = require("obsidian");
 // TaskAddPanel.ts
 var import_obsidian5 = require("obsidian");
 var TaskAddPanel = class extends import_obsidian5.Modal {
-  constructor(app, plugin, excludeIds, onTasksAdded, onNewTaskCreated) {
+  constructor(app, plugin, excludeIds, onTasksAdded, onNewTaskCreated, onTaskDeletedFromList) {
     super(app);
     // State
     this.allTasks = [];
@@ -4944,6 +4944,7 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
     this.excludeIds = excludeIds;
     this.onTasksAdded = onTasksAdded;
     this.onNewTaskCreated = onNewTaskCreated;
+    this.onTaskDeletedFromList = onTaskDeletedFromList;
   }
   async onOpen() {
     const { contentEl } = this;
@@ -4970,6 +4971,13 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
     createBtn.createSpan({ text: " " + t("addPanel.createNew") });
     createBtn.addEventListener("click", () => {
       this.openCreateTaskModal();
+    });
+    contentEl.createEl("p", {
+      text: t("addPanel.linkedTasks"),
+      cls: "tasklist-add-subtitle"
+    });
+    this.linkedListEl = contentEl.createDiv({
+      cls: "tasklist-add-linked-list"
     });
     contentEl.createDiv({ cls: "tasklist-add-separator" });
     contentEl.createEl("p", {
@@ -5071,7 +5079,7 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
       attr: { "aria-label": t("common.cancel") }
     });
     cancelBtn.addEventListener("click", () => this.close());
-    this.renderTaskList();
+    this.renderPanelLists();
   }
   // ───── Open nested TaskModal for new task ─────
   openCreateTaskModal() {
@@ -5083,7 +5091,10 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
         void this.loadPanelTasks();
       },
       async (data) => {
-        const newTask = await this.onNewTaskCreated(data);
+        const newTask = await this.onNewTaskCreated({
+          ...data,
+          status: "pending"
+        });
         this.excludeIds.add(newTask.id);
         await this.onTasksAdded([newTask.id]);
       }
@@ -5094,7 +5105,50 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
       this.allTasks = await this.plugin.taskDatabase.readTasks();
     } catch (e) {
     }
+    this.renderPanelLists();
+  }
+  renderPanelLists() {
+    this.renderLinkedTaskList();
     this.renderTaskList();
+  }
+  // ───── Render linked task list ─────
+  renderLinkedTaskList() {
+    this.linkedListEl.empty();
+    const linkedTasks = this.allTasks.filter(
+      (task) => this.excludeIds.has(task.id)
+    );
+    if (linkedTasks.length === 0) {
+      this.linkedListEl.createDiv({
+        text: t("addPanel.emptyLinked"),
+        cls: "tasklist-add-empty tasklist-add-linked-empty"
+      });
+      return;
+    }
+    for (const task of linkedTasks) {
+      const row = this.linkedListEl.createDiv({
+        cls: "tasklist-add-row tasklist-add-linked-row"
+      });
+      row.createSpan({
+        text: task.title,
+        cls: "tasklist-add-row-title"
+      });
+      row.createSpan({
+        text: getStatusLabel(task.status),
+        cls: "tasklist-status-badge tasklist-status-" + task.status
+      });
+      const removeBtn = row.createEl("button", {
+        cls: "tasklist-btn-small tasklist-btn-remove-small tasklist-add-delete-btn",
+        attr: {
+          "aria-label": t("addPanel.deleteTaskAria") + ": " + task.title,
+          "data-tooltip-position": "top"
+        }
+      });
+      (0, import_obsidian5.setIcon)(removeBtn, "trash-2");
+      removeBtn.addEventListener("click", (evt) => {
+        evt.stopPropagation();
+        void this.deleteLinkedTask(task);
+      });
+    }
   }
   // ───── Render filtered task list ─────
   renderTaskList() {
@@ -5174,6 +5228,54 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
     this.selectAllCheckbox.checked = false;
     this.updateCounter();
   }
+  async deleteLinkedTask(task) {
+    const confirmed = await this.showDeleteConfirm(task);
+    if (!confirmed)
+      return;
+    try {
+      await this.onTaskDeletedFromList(task.id);
+      this.excludeIds.delete(task.id);
+      this.allTasks = this.allTasks.filter((item) => item.id !== task.id);
+      this.renderPanelLists();
+      new import_obsidian5.Notice(t("addPanel.notices.deleteSuccess"));
+    } catch (error) {
+      console.error("TaskList: Failed to delete task from add panel:", error);
+      new import_obsidian5.Notice(t("addPanel.notices.deleteFailed"));
+    }
+  }
+  async showDeleteConfirm(task) {
+    return new Promise((resolve) => {
+      const notice = new import_obsidian5.Notice(
+        t("addPanel.deleteConfirm") + ": " + task.title + "?",
+        0
+      );
+      const noticeEl = notice.noticeEl;
+      const buttonContainer = noticeEl.createDiv({
+        cls: "tasklist-confirm-buttons"
+      });
+      const confirmBtn = buttonContainer.createEl("button", {
+        text: t("common.delete"),
+        cls: "mod-warning",
+        attr: {
+          "aria-label": t("addPanel.confirmDeleteAria")
+        }
+      });
+      confirmBtn.addEventListener("click", () => {
+        notice.hide();
+        resolve(true);
+      });
+      const cancelBtn = buttonContainer.createEl("button", {
+        text: t("common.cancel"),
+        attr: {
+          "aria-label": t("addPanel.cancelDeleteAria")
+        }
+      });
+      cancelBtn.addEventListener("click", () => {
+        notice.hide();
+        resolve(false);
+      });
+    });
+  }
   // ───── Selection counter ─────
   updateCounter() {
     let count = 0;
@@ -5196,7 +5298,10 @@ var TaskAddPanel = class extends import_obsidian5.Modal {
     }
     try {
       await this.onTasksAdded(selectedIds);
-      this.close();
+      for (const id of selectedIds) {
+        this.excludeIds.add(id);
+      }
+      this.renderPanelLists();
     } catch (error) {
       console.error("TaskList: Failed to add tasks:", error);
       new import_obsidian5.Notice(t("addPanel.notices.addFailed"));
@@ -5717,6 +5822,12 @@ ${ID_LIST_START}${body}${ID_LIST_END}`;
           date: data.date,
           dateEnd: data.dateEnd
         });
+      },
+      async (id) => {
+        const deleted = await this.plugin.taskDatabase.deleteTask(id);
+        if (!deleted)
+          throw new Error("Task delete failed");
+        await this.removeIdFromBlock(id);
       }
     ).open();
   }
@@ -8306,13 +8417,21 @@ var zh_default = {
   addPanel: {
     title: "\u6DFB\u52A0\u4EFB\u52A1\u5230\u5217\u8868",
     createNew: "\u521B\u5EFA\u65B0\u4EFB\u52A1",
+    linkedTasks: "\u5F53\u524D\u5217\u8868\u4E2D\u7684\u4EFB\u52A1\uFF1A",
+    emptyLinked: "\u5F53\u524D\u5217\u8868\u8FD8\u6CA1\u6709\u4EFB\u52A1\u3002",
     pickFromDb: "\u6216\u4ECE\u6570\u636E\u5E93\u4E2D\u9009\u62E9\uFF1A",
     emptyNone: "\u6570\u636E\u5E93\u4E2D\u6CA1\u6709\u4EFB\u52A1\uFF0C\u8BF7\u5148\u521B\u5EFA\u4E00\u4E2A\u3002",
     emptyAllIncluded: "\u6570\u636E\u5E93\u4E2D\u7684\u4EFB\u52A1\u5DF2\u5168\u90E8\u5728\u6B64\u5217\u8868\u4E2D\u3002",
     addSelected: "\u6DFB\u52A0\u6240\u9009",
+    deleteConfirm: "\u786E\u5B9A\u8981\u4ECE\u6570\u636E\u5E93\u5220\u9664\u4EFB\u52A1",
+    deleteTaskAria: "\u4ECE\u6570\u636E\u5E93\u5220\u9664\u4EFB\u52A1",
+    confirmDeleteAria: "\u786E\u8BA4\u5220\u9664\u6B64\u4EFB\u52A1",
+    cancelDeleteAria: "\u53D6\u6D88\u5220\u9664\u4EFB\u52A1",
     notices: {
       noSelection: "\u672A\u9009\u62E9\u4EFB\u52A1",
-      addFailed: "\u6DFB\u52A0\u4EFB\u52A1\u5931\u8D25"
+      addFailed: "\u6DFB\u52A0\u4EFB\u52A1\u5931\u8D25",
+      deleteSuccess: "\u4EFB\u52A1\u5DF2\u5220\u9664",
+      deleteFailed: "\u5220\u9664\u4EFB\u52A1\u5931\u8D25"
     }
   },
   okr: {
@@ -8674,13 +8793,21 @@ var en_default = {
   addPanel: {
     title: "Add tasks to list",
     createNew: "Create new task",
+    linkedTasks: "Tasks in this list:",
+    emptyLinked: "No tasks in this list yet.",
     pickFromDb: "Or pick from database:",
     emptyNone: "No tasks in database. Create one first.",
     emptyAllIncluded: "All database tasks are already in this list.",
     addSelected: "Add selected",
+    deleteConfirm: "Delete task from database",
+    deleteTaskAria: "Delete task from database",
+    confirmDeleteAria: "Confirm deleting this task",
+    cancelDeleteAria: "Cancel deleting task",
     notices: {
       noSelection: "No tasks selected",
-      addFailed: "Failed to add tasks"
+      addFailed: "Failed to add tasks",
+      deleteSuccess: "Task deleted",
+      deleteFailed: "Failed to delete task"
     }
   },
   okr: {

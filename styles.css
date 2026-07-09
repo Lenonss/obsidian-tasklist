@@ -936,6 +936,30 @@ input.tasklist-input-error {
   outline-offset: 1px;
 }
 
+/* -- Linked task list -- */
+.tasklist-add-linked-list {
+  max-height: 22vh;
+  overflow-y: auto;
+  margin-bottom: var(--size-4-2);
+}
+
+.tasklist-add-linked-row {
+  background: var(--background-secondary);
+}
+
+.tasklist-add-linked-empty {
+  padding: var(--size-4-2);
+}
+
+.tasklist-add-delete-btn {
+  flex-shrink: 0;
+}
+
+.tasklist-add-delete-btn:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
 /* -- Select all row -- */
 .tasklist-add-select-all {
   display: flex;
