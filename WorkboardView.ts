@@ -12,6 +12,7 @@ import type {
   KeyResult,
 } from './types';
 import { VIEW_TYPE_WORKBOARD } from './types';
+import { TaskModal } from './TaskModal';
 import {
   toDateStr,
   parseDateStr,
@@ -1185,15 +1186,7 @@ export class WorkboardView extends ItemView {
     });
 
     card.addEventListener('click', () => {
-      if (task.sourceFile) {
-        const file =
-          this.plugin.app.vault.getAbstractFileByPath(
-            task.sourceFile
-          );
-        if (file instanceof TFile) {
-          this.plugin.app.workspace.getLeaf(false).openFile(file);
-        }
-      }
+      this.openEditTaskModal(task);
     });
 
     const dot = card.createSpan({
@@ -1205,6 +1198,12 @@ export class WorkboardView extends ItemView {
       text: title,
       cls: 'workproject--CalendarCardTitle',
     });
+  }
+
+  private openEditTaskModal(task: Task) {
+    new TaskModal(this.plugin.app, this.plugin, task, () => {
+      void this.refresh();
+    }).open();
   }
 
   async onClose() {
