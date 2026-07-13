@@ -9,14 +9,12 @@ export class TaskAddPanel extends Modal {
   private excludeIds: Set<string>;
   private onTasksAdded: (ids: string[]) => Promise<void>;
   private onNewTaskCreated: (data: TaskSubmitData) => Promise<Task>;
-  private onTaskDeletedFromList: (id: string) => Promise<void>;
 
   // State
   private allTasks: Task[] = [];
   private checkboxes: Map<string, HTMLInputElement> = new Map();
   private selectAllCheckbox!: HTMLInputElement;
   private counterEl!: HTMLElement;
-  private linkedListEl!: HTMLElement;
   private listEl!: HTMLElement;
   private searchInput!: HTMLInputElement;
   private statusFilter!: HTMLSelectElement;
@@ -27,15 +25,13 @@ export class TaskAddPanel extends Modal {
     plugin: TaskListPlugin,
     excludeIds: Set<string>,
     onTasksAdded: (ids: string[]) => Promise<void>,
-    onNewTaskCreated: (data: TaskSubmitData) => Promise<Task>,
-    onTaskDeletedFromList: (id: string) => Promise<void>
+    onNewTaskCreated: (data: TaskSubmitData) => Promise<Task>
   ) {
     super(app);
     this.plugin = plugin;
     this.excludeIds = excludeIds;
     this.onTasksAdded = onTasksAdded;
     this.onNewTaskCreated = onNewTaskCreated;
-    this.onTaskDeletedFromList = onTaskDeletedFromList;
   }
 
   async onOpen() {
@@ -72,17 +68,7 @@ export class TaskAddPanel extends Modal {
       this.openCreateTaskModal();
     });
 
-    // ── 2. Already linked tasks ──
-    contentEl.createEl('p', {
-      text: t('addPanel.linkedTasks'),
-      cls: 'tasklist-add-subtitle',
-    });
-    this.linkedListEl = contentEl.createDiv({
-      cls: 'tasklist-add-linked-list',
-    });
-
-    // ── Separator ──
-    contentEl.createDiv({ cls: 'tasklist-add-separator' });
+    // ── 2. Pick from database section ──
     contentEl.createEl('p', {
       text: t('addPanel.pickFromDb'),
       cls: 'tasklist-add-subtitle',
@@ -228,55 +214,7 @@ export class TaskAddPanel extends Modal {
   }
 
   private renderPanelLists() {
-    this.renderLinkedTaskList();
     this.renderTaskList();
-  }
-
-  // ───── Render linked task list ─────
-
-  private renderLinkedTaskList() {
-    this.linkedListEl.empty();
-
-    const linkedTasks = this.allTasks.filter((task) =>
-      this.excludeIds.has(task.id)
-    );
-
-    if (linkedTasks.length === 0) {
-      this.linkedListEl.createDiv({
-        text: t('addPanel.emptyLinked'),
-        cls: 'tasklist-add-empty tasklist-add-linked-empty',
-      });
-      return;
-    }
-
-    for (const task of linkedTasks) {
-      const row = this.linkedListEl.createDiv({
-        cls: 'tasklist-add-row tasklist-add-linked-row',
-      });
-
-      row.createSpan({
-        text: task.title,
-        cls: 'tasklist-add-row-title',
-      });
-
-      row.createSpan({
-        text: getStatusLabel(task.status),
-        cls: 'tasklist-status-badge tasklist-status-' + task.status,
-      });
-
-      const removeBtn = row.createEl('button', {
-        cls: 'tasklist-btn-small tasklist-btn-remove-small tasklist-add-delete-btn',
-        attr: {
-          'aria-label': t('addPanel.deleteTaskAria') + ': ' + task.title,
-          'data-tooltip-position': 'top',
-        },
-      });
-      setIcon(removeBtn, 'trash-2');
-      removeBtn.addEventListener('click', (evt) => {
-        evt.stopPropagation();
-        void this.deleteLinkedTask(task);
-      });
-    }
   }
 
   // ───── Render filtered task list ─────
@@ -371,58 +309,6 @@ export class TaskAddPanel extends Modal {
 
     this.selectAllCheckbox.checked = false;
     this.updateCounter();
-  }
-
-  private async deleteLinkedTask(task: Task) {
-    const confirmed = await this.showDeleteConfirm(task);
-    if (!confirmed) return;
-
-    try {
-      await this.onTaskDeletedFromList(task.id);
-      this.excludeIds.delete(task.id);
-      this.allTasks = this.allTasks.filter((item) => item.id !== task.id);
-      this.renderPanelLists();
-      new Notice(t('addPanel.notices.deleteSuccess'));
-    } catch (error) {
-      console.error('TaskList: Failed to delete task from add panel:', error);
-      new Notice(t('addPanel.notices.deleteFailed'));
-    }
-  }
-
-  private async showDeleteConfirm(task: Task): Promise<boolean> {
-    return new Promise((resolve) => {
-      const notice = new Notice(
-        t('addPanel.deleteConfirm') + ': ' + task.title + '?',
-        0
-      );
-      const noticeEl = notice.noticeEl;
-      const buttonContainer = noticeEl.createDiv({
-        cls: 'tasklist-confirm-buttons',
-      });
-
-      const confirmBtn = buttonContainer.createEl('button', {
-        text: t('common.delete'),
-        cls: 'mod-warning',
-        attr: {
-          'aria-label': t('addPanel.confirmDeleteAria'),
-        },
-      });
-      confirmBtn.addEventListener('click', () => {
-        notice.hide();
-        resolve(true);
-      });
-
-      const cancelBtn = buttonContainer.createEl('button', {
-        text: t('common.cancel'),
-        attr: {
-          'aria-label': t('addPanel.cancelDeleteAria'),
-        },
-      });
-      cancelBtn.addEventListener('click', () => {
-        notice.hide();
-        resolve(false);
-      });
-    });
   }
 
   // ───── Selection counter ─────

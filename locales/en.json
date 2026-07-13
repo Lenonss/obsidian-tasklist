@@ -230,21 +230,13 @@
   "addPanel": {
     "title": "Add tasks to list",
     "createNew": "Create new task",
-    "linkedTasks": "Tasks in this list:",
-    "emptyLinked": "No tasks in this list yet.",
-    "pickFromDb": "Or pick from database:",
+    "pickFromDb": "Pick from database:",
     "emptyNone": "No tasks in database. Create one first.",
     "emptyAllIncluded": "All database tasks are already in this list.",
     "addSelected": "Add selected",
-    "deleteConfirm": "Delete task from database",
-    "deleteTaskAria": "Delete task from database",
-    "confirmDeleteAria": "Confirm deleting this task",
-    "cancelDeleteAria": "Cancel deleting task",
     "notices": {
       "noSelection": "No tasks selected",
-      "addFailed": "Failed to add tasks",
-      "deleteSuccess": "Task deleted",
-      "deleteFailed": "Failed to delete task"
+      "addFailed": "Failed to add tasks"
     }
   },
   "okr": {

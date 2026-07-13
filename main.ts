@@ -154,10 +154,31 @@ export default class TaskListPlugin extends Plugin {
           item
             .setTitle(t('menu.insertTaskList'))
             .setIcon('list-checks')
-            .onClick(() => {
+            .onClick(async () => {
               const cursor = editor.getCursor();
+
+              // Auto-fill tasks from current file's frontmatter date
+              let inner = '';
+              const file = view.file;
+              if (file) {
+                const cache = this.app.metadataCache.getFileCache(file);
+                const date = cache?.frontmatter?.date as string | undefined;
+                if (date) {
+                  try {
+                    const tasks = await this.taskDatabase.readTasksByDate(date);
+                    if (tasks.length > 0) {
+                      const blockId = Math.random().toString(36).substring(2, 10);
+                      const uuids = tasks.map((task) => task.id).join('\n');
+                      inner = `:block-id: ${blockId}\n:task-idList-start:\n${uuids}\n:task-idList-end:`;
+                    }
+                  } catch {
+                    // Silently fall back to empty block
+                  }
+                }
+              }
+
               editor.replaceRange(
-                '\n```tasklist\n\n```\n',
+                '\n```tasklist\n' + inner + '\n```\n',
                 cursor
               );
             });

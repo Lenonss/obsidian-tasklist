@@ -653,11 +653,6 @@ export class TaskListBlock extends MarkdownRenderChild {
           date: data.date,
           dateEnd: data.dateEnd,
         });
-      },
-      async (id: string) => {
-        const deleted = await this.plugin.taskDatabase.deleteTask(id);
-        if (!deleted) throw new Error('Task delete failed');
-        await this.removeIdFromBlock(id);
       }
     ).open();
   }

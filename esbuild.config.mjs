@@ -71,6 +71,8 @@ const context = await esbuild.context({
 
 if (prod) {
   await context.rebuild();
+  await context.dispose();
+  process.exit(0);
 } else {
   await context.watch();
 }
