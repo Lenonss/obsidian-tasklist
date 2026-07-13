@@ -95,6 +95,10 @@ export class TaskAddPanel extends Modal {
       value: 'all',
     });
     this.statusFilter.createEl('option', {
+      text: t('tasklist.filterStatus.not-done'),
+      value: 'not-done',
+    });
+    this.statusFilter.createEl('option', {
       text: t('tasklist.filterStatus.pending'),
       value: 'pending',
     });
@@ -106,6 +110,7 @@ export class TaskAddPanel extends Modal {
       text: t('tasklist.filterStatus.done'),
       value: 'done',
     });
+    this.statusFilter.value = 'not-done';
     this.statusFilter.addEventListener('change', () =>
       this.renderTaskList()
     );
@@ -230,7 +235,11 @@ export class TaskAddPanel extends Modal {
     // Filter tasks: exclude already-referenced, apply search + filters
     const candidates = this.allTasks.filter((t) => {
       if (this.excludeIds.has(t.id)) return false;
-      if (statusVal !== 'all' && t.status !== statusVal) return false;
+      if (statusVal === 'not-done') {
+        if (t.status === 'done') return false;
+      } else if (statusVal !== 'all' && t.status !== statusVal) {
+        return false;
+      }
       if (priorityVal !== 'all' && t.priority !== priorityVal) return false;
       if (searchQuery) {
         const haystack = (t.title + ' ' + t.content).toLowerCase();
@@ -305,10 +314,78 @@ export class TaskAddPanel extends Modal {
         text: getPriorityLabel(task.priority),
         cls: 'tasklist-add-row-priority',
       });
+
+      // Delete from database
+      const removeBtn = row.createEl('button', {
+        cls: 'tasklist-btn-small tasklist-btn-remove-small tasklist-add-delete-btn',
+        attr: {
+          'aria-label': t('addPanel.deleteTaskAria') + ': ' + task.title,
+          'data-tooltip-position': 'top',
+        },
+      });
+      setIcon(removeBtn, 'trash-2');
+      removeBtn.addEventListener('click', (evt) => {
+        evt.stopPropagation();
+        void this.deleteTaskFromDb(task);
+      });
     }
 
     this.selectAllCheckbox.checked = false;
     this.updateCounter();
+  }
+
+  // ───── Delete task from database ─────
+
+  private async deleteTaskFromDb(task: Task) {
+    const confirmed = await this.showDeleteConfirm(task);
+    if (!confirmed) return;
+
+    try {
+      await this.plugin.taskDatabase.deleteTask(task.id);
+      this.excludeIds.delete(task.id);
+      this.allTasks = this.allTasks.filter((item) => item.id !== task.id);
+      this.renderPanelLists();
+      new Notice(t('addPanel.notices.deleteSuccess'));
+    } catch (error) {
+      console.error('TaskList: Failed to delete task from add panel:', error);
+      new Notice(t('addPanel.notices.deleteFailed'));
+    }
+  }
+
+  private async showDeleteConfirm(task: Task): Promise<boolean> {
+    return new Promise((resolve) => {
+      const notice = new Notice(
+        t('addPanel.deleteConfirm') + ': ' + task.title + '?',
+        0
+      );
+      const noticeEl = notice.noticeEl;
+      const buttonContainer = noticeEl.createDiv({
+        cls: 'tasklist-confirm-buttons',
+      });
+
+      const confirmBtn = buttonContainer.createEl('button', {
+        text: t('common.delete'),
+        cls: 'mod-warning',
+        attr: {
+          'aria-label': t('addPanel.confirmDeleteAria'),
+        },
+      });
+      confirmBtn.addEventListener('click', () => {
+        notice.hide();
+        resolve(true);
+      });
+
+      const cancelBtn = buttonContainer.createEl('button', {
+        text: t('common.cancel'),
+        attr: {
+          'aria-label': t('addPanel.cancelDeleteAria'),
+        },
+      });
+      cancelBtn.addEventListener('click', () => {
+        notice.hide();
+        resolve(false);
+      });
+    });
   }
 
   // ───── Selection counter ─────

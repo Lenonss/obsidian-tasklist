@@ -144,6 +144,7 @@
     "parentHint": "Manage subtasks in expanded view",
     "filterStatus": {
       "all": "All statuses",
+      "not-done": "Not done",
       "pending": "Pending",
       "in-progress": "In Progress",
       "done": "Done"
@@ -234,9 +235,15 @@
     "emptyNone": "No tasks in database. Create one first.",
     "emptyAllIncluded": "All database tasks are already in this list.",
     "addSelected": "Add selected",
+    "deleteConfirm": "Delete task from database",
+    "deleteTaskAria": "Delete task from database",
+    "confirmDeleteAria": "Confirm deleting this task",
+    "cancelDeleteAria": "Cancel deleting task",
     "notices": {
       "noSelection": "No tasks selected",
-      "addFailed": "Failed to add tasks"
+      "addFailed": "Failed to add tasks",
+      "deleteSuccess": "Task deleted",
+      "deleteFailed": "Failed to delete task"
     }
   },
   "okr": {
