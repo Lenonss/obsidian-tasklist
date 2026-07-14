@@ -25,6 +25,8 @@ interface OkrBlockConfig {
   objectiveId: string; // UUID
   title: string;
   krUuids: string[];
+  /** @deprecated Use krUuids instead — kept for backward-compatible parsing of old blocks */
+  krIds?: string[];
 }
 
 // ───── OkrBlock ─────
@@ -402,6 +404,7 @@ export class OkrBlock extends MarkdownRenderChild {
       if (parsed.objectiveId) config.objectiveId = parsed.objectiveId;
       if (parsed.title) config.title = parsed.title;
       if (Array.isArray(parsed.krUuids)) config.krUuids = parsed.krUuids;
+      else if (Array.isArray(parsed.krIds)) config.krUuids = parsed.krIds as string[];
     } catch {
       // Keep defaults on parse error
     }
@@ -412,9 +415,9 @@ export class OkrBlock extends MarkdownRenderChild {
   private buildBlockContent(config: OkrBlockConfig): string {
     const json = JSON.stringify(
       {
-        objectiveId: config.objectiveId,
-        title: config.title || undefined,
-        krIds: config.krUuids,
+      objectiveId: config.objectiveId,
+      title: config.title || undefined,
+      krUuids: config.krUuids,
       },
       null,
       2
