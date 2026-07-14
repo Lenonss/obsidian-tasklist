@@ -6118,6 +6118,8 @@ var OkrBlock = class extends import_obsidian7.MarkdownRenderChild {
         config.title = parsed.title;
       if (Array.isArray(parsed.krUuids))
         config.krUuids = parsed.krUuids;
+      else if (Array.isArray(parsed.krIds))
+        config.krUuids = parsed.krIds;
     } catch (e) {
     }
     return config;
@@ -6127,7 +6129,7 @@ var OkrBlock = class extends import_obsidian7.MarkdownRenderChild {
       {
         objectiveId: config.objectiveId,
         title: config.title || void 0,
-        krIds: config.krUuids
+        krUuids: config.krUuids
       },
       null,
       2
@@ -9540,3 +9542,4 @@ ${JSON.stringify({ objectiveId: "", title: "", krIds: [] }, null, 2)}`;
     }
   }
 };
+//# sourceMappingURL=main.js.map
